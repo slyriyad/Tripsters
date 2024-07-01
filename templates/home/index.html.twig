@@ -4,6 +4,29 @@
 {% block title %}Home{% endblock %}
 
 {% block body %}
-<h1>Welcome to Tripsters</h1>
-<p>Your ultimate travel planning app!</p>
+<div class="wrapper">
+    <div class="one">
+        <img src="{{ asset('img/logo_tripsters.png') }}" alt="">
+        <div id="cards" class="card">
+            <p>GÉRER votre budget et suivre vos dépenses en temps réel.</p>
+        </div>
+        <div id="cards" class="card">
+            <p>CRÉER des voyages et inviter des participants.</p>
+        </div>
+        <div id="cards" class="card">
+            <p>ORGANISER et ajouter des activités variées.</p>
+        </div>
+        <button class="inscription">
+            <a href="{{ path('app_register') }}">Register</a>
+        </button>
+        <button class="connexion">
+            <a href="{{ path('app_login') }}">Login</a>
+        </button>
+        <img src="" alt="">
+    </div>
+    <div class="two">
+        <img src="{{ asset('img/montgolfiere.png') }}" alt="">
+    </div>
+</div>
+
 {% endblock %}

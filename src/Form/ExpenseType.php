@@ -2,25 +2,28 @@
 
 namespace App\Form;
 
-use App\Entity\CategoryExpense;
-use App\Entity\Expense;
 use App\Entity\Trip;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Expense;
+use App\Entity\CategoryExpense;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 class ExpenseType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('amount')
-            ->add('descrition')
-            ->add('name')
+            ->add('amount',IntegerType::class)
+            ->add('descrition',TextType::class)
+            ->add('name',TextType::class)
             ->add('date', null, [
                 'widget' => 'single_text',
-            ])
+            ],DateType::class)
             ->add('trip', EntityType::class, [
                 'class' => Trip::class,
                 'choice_label' => 'id',

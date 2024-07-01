@@ -3,16 +3,20 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Tripsters{% endblock %}</title>
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+{% endblock %}
     </head>
     <body>
         <nav>
             <ul>
+            {% if is_granted('ROLE_USER') %}
                 <li><a href="{{ path('home') }}">Home</a></li>
                 <li><a href="{{ path('app_trip_index') }}">Trips</a></li>
                 <li><a href="{{ path('app_activity_index') }}">Activities</a></li>
                 <li><a href="{{ path('app_expense_index') }}">Expenses</a></li>
                 <li><a href="{{ path('app_user_index') }}">Profile</a></li>
+            {% endif %}
                 {% if app.user %}
                     <li><a href="{{ path('app_logout') }}">Logout</a></li>
                 {% else %}
