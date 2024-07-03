@@ -1,0 +1,39 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.wrapper{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 2fr 1fr;
+    height: 100vh;
+}
+
+.one {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center
+}
+
+.one img {
+    width: 45%;
+    margin: 5% 0%;
+}
+
+.two img {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height:100%;
+    width: 40%;
+}
+
+#cards{
+    height: 10vh;
+    background-color: #007EA7;
+    padding: 2% 10%;
+    margin: 2% 0%;
+}

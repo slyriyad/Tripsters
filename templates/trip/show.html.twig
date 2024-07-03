@@ -39,9 +39,67 @@
                 <th>CreationDate</th>
                 <td>{{ trip.creationDate ? trip.creationDate|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
+
+            
         </tbody>
     </table>
+    <h2>Activités</h2>
+    {% if trip.tripActivities is not empty %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Coût</th>
+                    <th>Début</th>
+                    <th>Fin</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tripActivity in trip.tripActivities %}
+                    <tr>
+                        <td>{{ tripActivity.activity.name }}</td>
+                        <td>{{ tripActivity.activity.description }}</td>
+                        <td>{{ tripActivity.activity.cost }}</td>
+                        <td>{{ tripActivity.startDate|date('d/m/Y H:i') }}</td>
+                        <td>{{ tripActivity.endDate|date('d/m/Y H:i') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Pas d'activités pour ce voyage pour l'instant.</p>
+    {% endif %}
+    <h2>Ajouter une activité</h2>
+    <a href="{{ path('trip_add_activity', {id: trip.id}) }}">Ajouter une activité</a><br>
 
+    <h2>Dépenses</h2>
+{% if trip.tripExpenses is not empty %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Coût</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tripExpense in trip.tripExpenses %}
+                <tr>
+                    <td>{{ tripExpense.expense.name }}</td>
+                    <td>{{ tripExpense.expense.description }}</td>
+                    <td>{{ tripExpense.expense.amount }}</td>
+                    <td>{{ tripExpense.expense.date|date('d/m/Y') }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Pas de dépenses pour ce voyage pour l'instant.</p>
+{% endif %}
+<h2>Ajouter une dépense</h2>
+<a href="{{ path('trip_add_expense', {id: trip.id}) }}">Ajouter une dépense</a><br>
     <a href="{{ path('app_trip_index') }}">back to list</a>
 
     <a href="{{ path('app_trip_edit', {'id': trip.id}) }}">edit</a>

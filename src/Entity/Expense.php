@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\ExpenseRepository;
+
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ExpenseRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: ExpenseRepository::class)]
 class Expense
@@ -18,19 +21,31 @@ class Expense
     private ?int $amount = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $descrition = null;
+    private ?string $description = null;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'expenses')]
     private ?Trip $trip = null;
 
     #[ORM\ManyToOne(inversedBy: 'expenses')]
     private ?CategoryExpense $categoryExpense = null;
+
+    /**
+     * @var Collection<int, tripexpense>
+     */
+    #[ORM\OneToMany(targetEntity: TripExpense::class, mappedBy: 'expense')]
+    private Collection $tripExpenses;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $date = null;
+
+    public function __construct()
+    {
+        $this->tripExpenses = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -49,14 +64,14 @@ class Expense
         return $this;
     }
 
-    public function getDescrition(): ?string
+    public function getDescription(): ?string
     {
-        return $this->descrition;
+        return $this->description;
     }
 
-    public function setDescrition(?string $descrition): static
+    public function setDescription(?string $description): static
     {
-        $this->descrition = $descrition;
+        $this->description = $description;
 
         return $this;
     }
@@ -73,17 +88,7 @@ class Expense
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
-    {
-        return $this->date;
-    }
-
-    public function setDate(?\DateTimeInterface $date): static
-    {
-        $this->date = $date;
-
-        return $this;
-    }
+    
 
     public function getTrip(): ?Trip
     {
@@ -105,6 +110,48 @@ class Expense
     public function setCategoryExpense(?CategoryExpense $categoryExpense): static
     {
         $this->categoryExpense = $categoryExpense;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, tripexpense>
+     */
+    public function getTripExpenses(): Collection
+    {
+        return $this->tripExpenses;
+    }
+
+    public function addTripExpense(TripExpense $tripExpense): static
+    {
+        if (!$this->tripExpenses->contains($tripExpense)) {
+            $this->tripExpenses->add($tripExpense);
+            $tripExpense->setExpense($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTripExpense(TripExpense $tripExpense): static
+    {
+        if ($this->tripExpenses->removeElement($tripExpense)) {
+            // set the owning side to null (unless already changed)
+            if ($tripExpense->getExpense() === $this) {
+                $tripExpense->setExpense(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): static
+    {
+        $this->date = $date;
 
         return $this;
     }

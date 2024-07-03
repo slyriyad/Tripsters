@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240624004422 extends AbstractMigration
+final class Version20240703121038 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,16 +20,14 @@ final class Version20240624004422 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE trip_user ADD user_id INT NOT NULL');
-        $this->addSql('ALTER TABLE trip_user ADD CONSTRAINT FK_A6AB4522A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
-        $this->addSql('CREATE INDEX IDX_A6AB4522A76ED395 ON trip_user (user_id)');
+        $this->addSql('ALTER TABLE activity ADD CONSTRAINT FK_AC74095A365B22FD FOREIGN KEY (category_activity_id) REFERENCES category_activity (id)');
+        $this->addSql('ALTER TABLE trip_activity ADD start_date DATETIME NOT NULL, ADD end_date DATETIME NOT NULL');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE trip_user DROP FOREIGN KEY FK_A6AB4522A76ED395');
-        $this->addSql('DROP INDEX IDX_A6AB4522A76ED395 ON trip_user');
-        $this->addSql('ALTER TABLE trip_user DROP user_id');
+        $this->addSql('ALTER TABLE trip_activity DROP start_date, DROP end_date');
+        $this->addSql('ALTER TABLE activity DROP FOREIGN KEY FK_AC74095A365B22FD');
     }
 }

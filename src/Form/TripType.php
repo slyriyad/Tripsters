@@ -34,4 +34,6 @@ class TripType extends AbstractType
             'data_class' => Trip::class,
         ]);
     }
+
+    
 }

@@ -4,12 +4,16 @@ namespace App\Controller;
 
 use App\Entity\Trip;
 use App\Form\TripType;
+use App\Entity\TripExpense;
+use App\Entity\TripActivity;
+use App\Form\TripExpenseType;
+use App\Form\TripActivityType;
 use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/trip')]
 class TripController extends AbstractController
@@ -45,9 +49,16 @@ class TripController extends AbstractController
     #[Route('/{id}', name: 'app_trip_show', methods: ['GET'])]
     public function show(Trip $trip): Response
     {
+    // Récupérer les activités et dépenses associées au voyage
+    $activities = $trip->getTripActivities();
+    $expenses = $trip->getTripExpenses();
+
         return $this->render('trip/show.html.twig', [
-            'trip' => $trip,
+        'trip' => $trip,
+        'activities' => $activities,
+        'expenses' => $expenses,
         ]);
+        
     }
 
     #[Route('/{id}/edit', name: 'app_trip_edit', methods: ['GET', 'POST'])]
@@ -78,5 +89,49 @@ class TripController extends AbstractController
         }
 
         return $this->redirectToRoute('app_trip_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/add-activity', name: 'trip_add_activity')]
+    public function addActivity(Request $request, Trip $trip, EntityManagerInterface $entityManager): Response
+    {
+        $tripActivity = new TripActivity();
+        $tripActivity->setTrip($trip);
+
+        $form = $this->createForm(TripActivityType::class, $tripActivity);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($tripActivity);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_trip_show', ['id' => $trip->getId()]);
+        }
+
+        return $this->render('trip/add_activity.html.twig', [
+            'trip' => $trip,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/{id}/add-expense', name: 'trip_add_expense')]
+    public function addExpense(Request $request, Trip $trip, EntityManagerInterface $entityManager): Response
+    {
+        $tripExpense = new TripExpense();
+        $tripExpense->setTrip($trip);
+
+        $form = $this->createForm(TripExpenseType::class, $tripExpense);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($tripExpense);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_trip_show', ['id' => $trip->getId()]);
+        }
+
+        return $this->render('trip/add_expense.html.twig', [
+            'trip' => $trip,
+            'form' => $form->createView(),
+        ]);
     }
 }

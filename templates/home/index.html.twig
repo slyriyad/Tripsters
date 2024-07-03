@@ -1,19 +1,21 @@
 {# templates/home/index.html.twig #}
-{% extends 'base.html.twig' %}
-
-{% block title %}Home{% endblock %}
+{# {% extends 'base.html.twig' %} #}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+{% endblock %}
+{# {% block title %}Home{% endblock %} #}
 
 {% block body %}
 <div class="wrapper">
     <div class="one">
         <img src="{{ asset('img/logo_tripsters.png') }}" alt="">
-        <div id="cards" class="card">
+        <div id="cards" class="card1">
             <p>GÉRER votre budget et suivre vos dépenses en temps réel.</p>
         </div>
-        <div id="cards" class="card">
+        <div id="cards" class="card2">
             <p>CRÉER des voyages et inviter des participants.</p>
         </div>
-        <div id="cards" class="card">
+        <div id="cards" class="card3">
             <p>ORGANISER et ajouter des activités variées.</p>
         </div>
         <button class="inscription">
@@ -22,7 +24,6 @@
         <button class="connexion">
             <a href="{{ path('app_login') }}">Login</a>
         </button>
-        <img src="" alt="">
     </div>
     <div class="two">
         <img src="{{ asset('img/montgolfiere.png') }}" alt="">

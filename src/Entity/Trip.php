@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TripRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -24,10 +25,18 @@ class Trip
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: 'datetime')]
+    #[Assert\GreaterThanOrEqual(
+        value: 'today',
+        message: "La date de début doit être égale ou postérieure à aujourd'hui."
+    )]
     private ?\DateTimeInterface $startDate = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: 'datetime')]
+    #[Assert\Expression(
+        expression: "this.getEndDate() > this.getStartDate()",
+        message: "La date de fin doit être postérieure à la date de début."
+    )]
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column(length: 255)]
@@ -57,11 +66,18 @@ class Trip
     #[ORM\OneToMany(targetEntity: Expense::class, mappedBy: 'trip')]
     private Collection $expenses;
 
+    /**
+     * @var Collection<int, tripexpense>
+     */
+    #[ORM\OneToMany(targetEntity: TripExpense::class, mappedBy: 'trip')]
+    private Collection $tripExpenses;
+
     public function __construct()
     {
         $this->tripUsers = new ArrayCollection();
         $this->TripActivities = new ArrayCollection();
         $this->expenses = new ArrayCollection();
+        $this->tripExpenses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -245,6 +261,36 @@ class Trip
             // set the owning side to null (unless already changed)
             if ($expense->getTrip() === $this) {
                 $expense->setTrip(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, tripexpense>
+     */
+    public function getTripExpenses(): Collection
+    {
+        return $this->tripExpenses;
+    }
+
+    public function addTripExpense(TripExpense $tripExpense): static
+    {
+        if (!$this->tripExpenses->contains($tripExpense)) {
+            $this->tripExpenses->add($tripExpense);
+            $tripExpense->setTrip($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTripExpense(TripExpense $tripExpense): static
+    {
+        if ($this->tripExpenses->removeElement($tripExpense)) {
+            // set the owning side to null (unless already changed)
+            if ($tripExpense->getTrip() === $this) {
+                $tripExpense->setTrip(null);
             }
         }
 
