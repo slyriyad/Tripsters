@@ -4,45 +4,34 @@
 
 {% block body %}
     <h1>Trip</h1>
-
+    
     <table class="table">
-        <tbody>
+        <thead>
             <tr>
                 <th>Id</th>
-                <td>{{ trip.id }}</td>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>StartDate</th>
+                    <th>EndDate</th>
+                    <th>Destination</th>
+                    <th>Budget</th>
+                    <th>CreationDate</th>
             </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ trip.name }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ trip.description }}</td>
-            </tr>
-            <tr>
-                <th>StartDate</th>
-                <td>{{ trip.startDate ? trip.startDate|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>EndDate</th>
-                <td>{{ trip.endDate ? trip.endDate|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Destination</th>
-                <td>{{ trip.destination }}</td>
-            </tr>
-            <tr>
-                <th>Budget</th>
-                <td>{{ trip.budget }}</td>
-            </tr>
-            <tr>
-                <th>CreationDate</th>
-                <td>{{ trip.creationDate ? trip.creationDate|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-
-            
+        </thead>
+        <tbody>
+                <tr>
+                    <td>{{ trip.id }}</td>
+                    <td>{{ trip.name }}</td>
+                    <td>{{ trip.description }}</td>
+                    <td>{{ trip.startDate ? trip.startDate|date('Y-m-d') : '' }}</td>
+                    <td>{{ trip.endDate ? trip.endDate|date('Y-m-d') : '' }}</td>
+                    <td>{{ trip.destination }}</td>
+                    <td>{{ trip.budget }}</td>
+                    <td>{{ trip.creationDate ? trip.creationDate|date('Y-m-d H:i:s') : '' }}</td>
+                </tr>
         </tbody>
     </table>
+            
     <h2>Activités</h2>
     {% if trip.tripActivities is not empty %}
         <table class="table">
@@ -70,39 +59,155 @@
     {% else %}
         <p>Pas d'activités pour ce voyage pour l'instant.</p>
     {% endif %}
-    <h2>Ajouter une activité</h2>
-    <a href="{{ path('trip_add_activity', {id: trip.id}) }}">Ajouter une activité</a><br>
+    {# <h2>Ajouter une activité</h2>
+    <a href="{{ path('trip_add_activity', {id: trip.id}) }}">Ajouter une activité</a><br> #}
 
-    <h2>Dépenses</h2>
-{% if trip.tripExpenses is not empty %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Description</th>
-                <th>Coût</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for tripExpense in trip.tripExpenses %}
+
+    <div class="calendar">
+        <div class="timeline">
+          <div class="spacer"></div>
+          <div class="time-marker">9 AM</div>
+          <div class="time-marker">10 AM</div>
+          <div class="time-marker">11 AM</div>
+          <div class="time-marker">12 PM</div>
+          <div class="time-marker">1 PM</div>
+          <div class="time-marker">2 PM</div>
+          <div class="time-marker">3 PM</div>
+          <div class="time-marker">4 PM</div>
+          <div class="time-marker">5 PM</div>
+          <div class="time-marker">6 PM</div>
+        </div>
+        <div class="days">
+            {% set current_date = trip.startDate %}
+            {% for i in 0..days %}
+                <div class="day">
+                    <div class="date">
+                        <p class="date-num">jour&nbsp;{{ i + 1 }}</p><br>
+                        <p class="date-day">{{ current_date|date('d M Y') }}
+                    </div>
+                    <div class="events">
+                        {% for activity in trip.tripActivities %}
+                            {% if activity.startDate|date('Y-m-d') <= current_date|date('Y-m-d') and activity.endDate|date('Y-m-d') >= current_date|date('Y-m-d') %}
+                                <div class="event">
+                                    <p>{{ activity.activity.name }}</p>
+                                    <p>{{ activity.activity.description }}</p>
+                                    <p>Coût: {{ activity.activity.cost }}</p>
+                                    <p>Début: {{ activity.startDate|date('H:i') }}</p>
+                                    <p>Fin: {{ activity.endDate|date('H:i') }}</p>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button class="add-activity" data-date="{{ current_date|date('Y-m-d') }}">Ajouter une activité</button>
+                </div>
+                {% set current_date = current_date|date_modify('+1 day') %}
+                {% endfor %}
+            </div>
+            <a href="{{ path('app_trip_index') }}">back to list</a>
+            
+            <a href="{{ path('app_trip_edit', {'id': trip.id}) }}">edit</a>
+            
+            {{ include('trip/_delete_form.html.twig') }}
+          <div id="activityModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Ajouter une activité</h2>
+                <form id="addActivityForm">
+                    <input type="text" id="activityName" placeholder="Nom de l'activité" required>
+                    <textarea id="activityDescription" placeholder="Description"></textarea>
+                    <input type="number" id="activityCost" placeholder="Coût">
+                    <input type="datetime-local" id="activityStartDate" required>
+                    <input type="datetime-local" id="activityEndDate" required>
+                    <button type="submit">Ajouter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    
+    {% endblock %}
+    
+    {% block javascripts %}
+        {{ parent() }}
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('.add-activity').on('click', function() {
+                    $('#activityModal').show();
+                    const date = $(this).data('date');
+                    $('#activityStartDate').val(date + 'T09:00');
+                    $('#activityEndDate').val(date + 'T10:00');
+                });
+    
+                $('.close').on('click', function() {
+                    $('#activityModal').hide();
+                });
+    
+                $('#addActivityForm').on('submit', function(e) {
+                    e.preventDefault();
+                    const tripId = {{ trip.id }};
+                    const data = {
+                        name: $('#activityName').val(),
+                        description: $('#activityDescription').val(),
+                        cost: $('#activityCost').val(),
+                        startDate: $('#activityStartDate').val(),
+                        endDate: $('#activityEndDate').val()
+                    };
+    
+                    $.ajax({
+                        url: '/trip/' + tripId + '/add-activity',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        success: function(response) {
+                            const newActivity = `
+                                <div class="event">
+                                    <p>${response.name}</p>
+                                    <p>${response.description}</p>
+                                    <p>Coût : ${response.cost} €</p>
+                                    <p>Début : ${response.startDate}</p>
+                                    <p>Fin : ${response.endDate}</p>
+                                </div>
+                            `;
+                            const dayColumn = $(`[data-date="${data.startDate.split('T')[0]}"]`).closest('.day');
+                            dayColumn.find('.events').append(newActivity);
+                            $('#activityModal').hide();
+                            $('#addActivityForm')[0].reset();
+                        },
+                        error: function(xhr) {
+                            alert('Une erreur est survenue : ' + xhr.responseJSON.error);
+                        }
+                    });
+                });
+            });
+        </script>
+    {% endblock %}
+        
+        
+        {# <h2>Dépenses</h2>
+    {% if trip.tripExpenses is not empty %}
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>{{ tripExpense.expense.name }}</td>
-                    <td>{{ tripExpense.expense.description }}</td>
-                    <td>{{ tripExpense.expense.amount }}</td>
-                    <td>{{ tripExpense.expense.date|date('d/m/Y') }}</td>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Coût</th>
+                    <th>Date</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>Pas de dépenses pour ce voyage pour l'instant.</p>
-{% endif %}
-<h2>Ajouter une dépense</h2>
-<a href="{{ path('trip_add_expense', {id: trip.id}) }}">Ajouter une dépense</a><br>
-    <a href="{{ path('app_trip_index') }}">back to list</a>
-
-    <a href="{{ path('app_trip_edit', {'id': trip.id}) }}">edit</a>
-
-    {{ include('trip/_delete_form.html.twig') }}
-{% endblock %}
+            </thead>
+            <tbody>
+                {% for tripExpense in trip.tripExpenses %}
+                    <tr>
+                        <td>{{ tripExpense.expense.name }}</td>
+                        <td>{{ tripExpense.expense.description }}</td>
+                        <td>{{ tripExpense.expense.amount }}</td>
+                        <td>{{ tripExpense.expense.date|date('d/m/Y') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Pas de dépenses pour ce voyage pour l'instant.</p>
+    {% endif %}
+    <h2>Ajouter une dépense</h2>
+    <a href="{{ path('trip_add_expense', {id: trip.id}) }}">Ajouter une dépense</a><br> #}
