@@ -19,7 +19,7 @@ class ExpenseType extends AbstractType
     {
         $builder
             ->add('amount',IntegerType::class)
-            ->add('descrition',TextType::class)
+            ->add('description',TextType::class)
             ->add('name',TextType::class)
             ->add('date', null, [
                 'widget' => 'single_text',

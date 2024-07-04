@@ -9,4 +9,5 @@
         {{ form_widget(form) }}
         <button class="btn">Ajouter</button>
     {{ form_end(form) }}
+    <a href="{{ path('app_activity_new', {trip_id: trip.id}) }}">Créer une nouvelle activité</a><br>
 {% endblock %}
