@@ -5,9 +5,7 @@ namespace App\Controller;
 use App\Entity\Trip;
 use App\Form\TripType;
 use App\Entity\Activity;
-use App\Entity\TripExpense;
 use App\Entity\TripActivity;
-use App\Form\TripExpenseType;
 use App\Form\TripActivityType;
 use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -53,16 +51,20 @@ class TripController extends AbstractController
     {
     // Récupérer les activités et dépenses associées au voyage
     $activities = $trip->getTripActivities();
-    $expenses = $trip->getTripExpenses();
     $startDate = $trip->getStartDate();
     $endDate = $trip->getEndDate();
     $interval = $startDate->diff($endDate);
     $days = $interval->days;
+
+    $totalCostActivity = 0;
+    foreach ($trip->getTripActivities() as $tripActivity) {
+        $totalCostActivity += $tripActivity->getActivity()->getCost();
+    }
         return $this->render('trip/show.html.twig', [
         'trip' => $trip,
         'activities' => $activities,
-        'expenses' => $expenses,
         'days' => $days,
+        'totalCostActivity' => $totalCostActivity,
         ]);
         
     }
@@ -98,59 +100,37 @@ class TripController extends AbstractController
     }
 
     #[Route('/{tripId}/add-activity', name: 'trip_add_activity', methods: ['POST'])]
-public function addActivity(Request $request, int $tripId, TripRepository $tripRepository, EntityManagerInterface $entityManager): JsonResponse
-{
-    $trip = $tripRepository->find($tripId);
-    if (!$trip) {
-        return new JsonResponse(['error' => 'Trip not found'], 404);
-    }
-
-    $data = json_decode($request->getContent(), true);
-
-    $activity = new Activity();
-    $activity->setName($data['name']);
-    $activity->setDescription($data['description']);
-    $activity->setCost($data['cost']);
-
-    $tripActivity = new TripActivity();
-    $tripActivity->setTrip($trip);
-    $tripActivity->setActivity($activity);
-    $tripActivity->setStartDate(new \DateTime($data['startDate']));
-    $tripActivity->setEndDate(new \DateTime($data['endDate']));
-
-    $entityManager->persist($activity);
-    $entityManager->persist($tripActivity);
-    $entityManager->flush();
-
-    return new JsonResponse([
-        'id' => $tripActivity->getId(),
-        'name' => $activity->getName(),
-        'description' => $activity->getDescription(),
-        'cost' => $activity->getCost(),
-        'startDate' => $tripActivity->getStartDate()->format('Y-m-d H:i:s'),
-        'endDate' => $tripActivity->getEndDate()->format('Y-m-d H:i:s'),
-    ]);
-}
-
-    #[Route('/{id}/add-expense', name: 'trip_add_expense')]
-    public function addExpense(Request $request, Trip $trip, EntityManagerInterface $entityManager): Response
+    public function addActivity(Request $request, int $tripId, TripRepository $tripRepository, EntityManagerInterface $entityManager): JsonResponse
     {
-        $tripExpense = new TripExpense();
-        $tripExpense->setTrip($trip);
-
-        $form = $this->createForm(TripExpenseType::class, $tripExpense);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($tripExpense);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_trip_show', ['id' => $trip->getId()]);
+        $trip = $tripRepository->find($tripId);
+        if (!$trip) {
+            return new JsonResponse(['error' => 'Trip not found'], 404);
         }
 
-        return $this->render('trip/add_expense.html.twig', [
-            'trip' => $trip,
-            'form' => $form->createView(),
+        $data = json_decode($request->getContent(), true);
+
+        $activity = new Activity();
+        $activity->setName($data['name']);
+        $activity->setDescription($data['description']);
+        $activity->setCost($data['cost']);
+
+        $tripActivity = new TripActivity();
+        $tripActivity->setTrip($trip);
+        $tripActivity->setActivity($activity);
+        $tripActivity->setStartDate(new \DateTime($data['startDate']));
+        $tripActivity->setEndDate(new \DateTime($data['endDate']));
+
+        $entityManager->persist($activity);
+        $entityManager->persist($tripActivity);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'id' => $tripActivity->getId(),
+            'name' => $activity->getName(),
+            'description' => $activity->getDescription(),
+            'cost' => $activity->getCost(),
+            'startDate' => $tripActivity->getStartDate()->format('Y-m-d H:i:s'),
+            'endDate' => $tripActivity->getEndDate()->format('Y-m-d H:i:s'),
         ]);
     }
 }

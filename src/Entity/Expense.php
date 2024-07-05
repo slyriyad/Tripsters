@@ -33,19 +33,10 @@ class Expense
     #[ORM\ManyToOne(inversedBy: 'expenses')]
     private ?CategoryExpense $categoryExpense = null;
 
-    /**
-     * @var Collection<int, tripexpense>
-     */
-    #[ORM\OneToMany(targetEntity: TripExpense::class, mappedBy: 'expense')]
-    private Collection $tripExpenses;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-    public function __construct()
-    {
-        $this->tripExpenses = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -114,35 +105,6 @@ class Expense
         return $this;
     }
 
-    /**
-     * @return Collection<int, tripexpense>
-     */
-    public function getTripExpenses(): Collection
-    {
-        return $this->tripExpenses;
-    }
-
-    public function addTripExpense(TripExpense $tripExpense): static
-    {
-        if (!$this->tripExpenses->contains($tripExpense)) {
-            $this->tripExpenses->add($tripExpense);
-            $tripExpense->setExpense($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTripExpense(TripExpense $tripExpense): static
-    {
-        if ($this->tripExpenses->removeElement($tripExpense)) {
-            // set the owning side to null (unless already changed)
-            if ($tripExpense->getExpense() === $this) {
-                $tripExpense->setExpense(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getDate(): ?\DateTimeInterface
     {

@@ -66,18 +66,10 @@ class Trip
     #[ORM\OneToMany(targetEntity: Expense::class, mappedBy: 'trip')]
     private Collection $expenses;
 
-    /**
-     * @var Collection<int, tripexpense>
-     */
-    #[ORM\OneToMany(targetEntity: TripExpense::class, mappedBy: 'trip')]
-    private Collection $tripExpenses;
-
     public function __construct()
     {
         $this->tripUsers = new ArrayCollection();
-        $this->TripActivities = new ArrayCollection();
         $this->expenses = new ArrayCollection();
-        $this->tripExpenses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -261,36 +253,6 @@ class Trip
             // set the owning side to null (unless already changed)
             if ($expense->getTrip() === $this) {
                 $expense->setTrip(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, tripexpense>
-     */
-    public function getTripExpenses(): Collection
-    {
-        return $this->tripExpenses;
-    }
-
-    public function addTripExpense(TripExpense $tripExpense): static
-    {
-        if (!$this->tripExpenses->contains($tripExpense)) {
-            $this->tripExpenses->add($tripExpense);
-            $tripExpense->setTrip($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTripExpense(TripExpense $tripExpense): static
-    {
-        if ($this->tripExpenses->removeElement($tripExpense)) {
-            // set the owning side to null (unless already changed)
-            if ($tripExpense->getTrip() === $this) {
-                $tripExpense->setTrip(null);
             }
         }
 

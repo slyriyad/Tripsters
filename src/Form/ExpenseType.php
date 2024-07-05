@@ -12,6 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class ExpenseType extends AbstractType
 {
@@ -21,12 +22,10 @@ class ExpenseType extends AbstractType
             ->add('amount',IntegerType::class)
             ->add('description',TextType::class)
             ->add('name',TextType::class)
-            ->add('date', null, [
+            ->add('date', DateType::class, [
                 'widget' => 'single_text',
-            ],DateType::class)
-            ->add('trip', EntityType::class, [
-                'class' => Trip::class,
-                'choice_label' => 'id',
+                'format' => 'yyyy-MM-dd',
+                'html5' => true,
             ])
             ->add('categoryExpense', EntityType::class, [
                 'class' => CategoryExpense::class,
