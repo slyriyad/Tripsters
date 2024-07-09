@@ -258,4 +258,49 @@ class Trip
 
         return $this;
     }
+
+    public function getParticipants(): Collection
+    {
+        return $this->tripUsers->map(function (TripUser $tripUser) {
+            return $tripUser->getUser();
+        });
+    }
+
+    // Optionnel : Méthode pour vérifier si un utilisateur est un participant
+    public function isParticipant(User $user): bool
+    {
+        foreach ($this->tripUsers as $tripUser) {
+            if ($tripUser->getUser() === $user) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Optionnel : Méthode pour ajouter un participant
+    public function addParticipant(User $user): self
+    {
+        if (!$this->isParticipant($user)) {
+            $tripUser = new TripUser();
+            $tripUser->setUser($user);
+            $tripUser->setTrip($this);
+            $this->tripUsers->add($tripUser);
+        }
+        return $this;
+    }
+
+    // Optionnel : Méthode pour retirer un participant
+    public function removeParticipant(User $user): self
+    {
+        $this->tripUsers->filter(function (TripUser $tripUser) use ($user) {
+            return $tripUser->getUser() === $user;
+        })->map(function (TripUser $tripUser) {
+            $this->tripUsers->removeElement($tripUser);
+            $tripUser->setTrip(null);
+        });
+        return $this;
+    }
 }
+
+
+

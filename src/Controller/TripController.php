@@ -8,6 +8,7 @@ use App\Entity\Activity;
 use App\Entity\TripActivity;
 use App\Form\TripActivityType;
 use App\Repository\TripRepository;
+use App\Repository\ExpenseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -132,5 +133,50 @@ class TripController extends AbstractController
             'startDate' => $tripActivity->getStartDate()->format('Y-m-d H:i:s'),
             'endDate' => $tripActivity->getEndDate()->format('Y-m-d H:i:s'),
         ]);
+    }
+
+    #[Route('/{id}/balances', name: 'app_trip_balances', methods: ['GET'])]
+    public function showBalances(Trip $trip, ExpenseRepository $expenseRepository): Response
+    {
+        // Logique pour calculer les soldes
+        $expenses = $expenseRepository->findBy(['trip' => $trip]);
+        $balances = $this->calculateBalances($trip, $expenses);
+
+        return $this->render('trip/balances.html.twig', [
+            'trip' => $trip,
+            'balances' => $balances,
+        ]);
+    }
+
+    private function calculateBalances(Trip $trip, array $expenses): array
+{
+    $balances = [];
+    foreach ($trip->getParticipants() as $participant) {
+        $balances[$participant->getId()] = 0;
+    }
+
+    foreach ($expenses as $expense) {
+        $paidBy = $expense->getPaidBy();
+        if ($paidBy) {
+            $paidById = $paidBy->getId();
+            if (!isset($balances[$paidById])) {
+                $balances[$paidById] = 0;
+            }
+            $balances[$paidById] += $expense->getAmount();
+        }
+
+        foreach ($expense->getExpenseSplits() as $split) {
+            $user = $split->getUser();
+            if ($user) {
+                $userId = $user->getId();
+                if (!isset($balances[$userId])) {
+                    $balances[$userId] = 0;
+                }
+                $balances[$userId] -= $split->getAmount();
+            }
+        }
+    }
+
+    return $balances;
     }
 }

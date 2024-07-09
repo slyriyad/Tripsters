@@ -41,9 +41,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: TripUser::class, mappedBy: 'user')]
     private Collection $tripUsers;
 
+    /**
+     * @var Collection<int, ExpenseSplit>
+     */
+    #[ORM\OneToMany(targetEntity: ExpenseSplit::class, mappedBy: 'user')]
+    private Collection $expenseSplits;
+
     public function __construct()
     {
         $this->tripUsers = new ArrayCollection();
+        $this->expenseSplits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,6 +152,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($tripUser->getUser() === $this) {
                 $tripUser->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ExpenseSplit>
+     */
+    public function getExpenseSplits(): Collection
+    {
+        return $this->expenseSplits;
+    }
+
+    public function addExpenseSplit(ExpenseSplit $expenseSplit): static
+    {
+        if (!$this->expenseSplits->contains($expenseSplit)) {
+            $this->expenseSplits->add($expenseSplit);
+            $expenseSplit->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExpenseSplit(ExpenseSplit $expenseSplit): static
+    {
+        if ($this->expenseSplits->removeElement($expenseSplit)) {
+            // set the owning side to null (unless already changed)
+            if ($expenseSplit->getUser() === $this) {
+                $expenseSplit->setUser(null);
             }
         }
 

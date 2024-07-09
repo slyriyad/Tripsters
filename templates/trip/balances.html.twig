@@ -1,0 +1,25 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Balances for {{ trip.name }}{% endblock %}
+
+{% block body %}
+    <h1>Balances for {{ trip.name }}</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Participant</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for participant in trip.participants %}
+            <tr>
+                <td>{{ participant.username }}</td>
+                <td>{{ balances[participant.id] / 100 }}€</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

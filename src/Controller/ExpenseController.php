@@ -2,14 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Trip;
 use App\Entity\Expense;
 use App\Form\ExpenseType;
+use App\Entity\ExpenseSplit;
+use App\Repository\TripRepository;
 use App\Repository\ExpenseRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/expense')]
 class ExpenseController extends AbstractController
@@ -78,4 +81,46 @@ class ExpenseController extends AbstractController
 
         return $this->redirectToRoute('app_expense_index', [], Response::HTTP_SEE_OTHER);
     }
+    
+    #[Route('/trip/{tripId}/expense/add', name: 'app_expense_add', methods: ['GET', 'POST'])]
+    public function addExpense(Request $request, int $tripId, EntityManagerInterface $entityManager, TripRepository $tripRepository): Response
+    {
+        $trip = $tripRepository->find($tripId);
+        if (!$trip) {
+            throw $this->createNotFoundException('Trip not found');
+        }
+        
+        $expense = new Expense();
+        $expense->setTrip($trip);
+        $expense->setPaidBy($this->getUser()); 
+        
+        $form = $this->createForm(ExpenseType::class, $expense);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+           
+            $splitAmount = $expense->getAmount() / count($trip->getParticipants());
+            foreach ($trip->getParticipants() as $participant) {
+                $split = new ExpenseSplit();
+                $split->setExpense($expense);
+                $split->setUser($participant);
+                $split->setAmount($splitAmount);
+                $expense->addExpenseSplit($split);
+            }
+            
+            $entityManager->persist($expense);
+            $entityManager->flush();
+            
+            return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
+        }
+
+        return $this->render('expense/new_modal.html.twig', [
+            'expense' => $expense,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    
 }
+    
+    
