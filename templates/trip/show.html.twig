@@ -7,9 +7,12 @@
 {% endblock %}
 {% block body %}
 <div class="up">
-    <div class="info_trip">
-        <h1>{{ trip.name }}</h1>
-        <p>Du {{ trip.startDate ? trip.startDate|date('d-m-Y') : '' }} au {{ trip.endDate ? trip.endDate|date('d-m-Y') : '' }}</p>
+    <div class="info-left">
+        <img src="https://wallpapercave.com/wp/wp3004763.jpg" alt="">
+        <div class="info_trip">
+            <h1>{{ trip.name }}</h1>
+            <p>Du {{ trip.startDate ? trip.startDate|date('d-m-Y') : '' }} au {{ trip.endDate ? trip.endDate|date('d-m-Y') : '' }}</p>
+        </div>
     </div>
 
     <div class="cards">
@@ -24,64 +27,65 @@
     </div>
 </div>
 <button class="add-activity">Ajouter une activité</button>
-    <div class="calendar">
-        <div class="swiper mySwiper">
-            <div class="swiper-wrapper">
-                {% set totalCostActivity = 0 %}
-                {% set current_date = trip.startDate %}
-                {% for i in 0..days %}
-                <div class="swiper-slide">
-                    <div class="day">
-                        <div class="date">
-                            <p class="date-num">JOUR&nbsp;{{ i + 1 }}</p>
-                            <p class="date-day">{{ current_date|date('d M Y') }}</p>
-                        </div>
-                        <div class="events">
-                            {% for activity in trip.tripActivities %}
-                            {% if activity.startDate|date('d-m-Y') <= current_date|date('d-m-Y') and activity.endDate|date('d-m-Y') >= current_date|date('d-m-Y') %}
-                            <div class="event">
-                                <div class="event-left">
-                                    <p>{{ activity.startDate|date('H:i') }}H</p>
-                                    <p>{{ activity.endDate|date('H:i') }}H</p>
-                                </div>
-                                <div class="event-right">
-                                    <p>{{ activity.activity.name }}</p>
-                                    <p>{{ activity.activity.description }}</p>
-                                    <p>Coût: {{ activity.activity.cost }} €</p>
-                                </div>
+<div class="calendar">
+    <div class="swiper mySwiper" style="min-height:500px">
+        <div class="swiper-wrapper">
+            {% set totalCostActivity = 0 %}
+            {% set current_date = trip.startDate %}
+            {% for i in 0..days %}
+            <div class="swiper-slide">
+                <div class="day">
+                    <div class="date">
+                        <p class="date-num">JOUR&nbsp;{{ i + 1 }}</p>
+                        <p class="date-day">{{ current_date|date('d M Y') }}</p>
+                    </div>
+                    <div class="events">
+                        {% for activity in trip.tripActivities %}
+                        {% if activity.startDate|date('d-m-Y') <= current_date|date('d-m-Y') and activity.endDate|date('d-m-Y') >= current_date|date('d-m-Y') %}
+                        <div class="event">
+                            <div class="event-left">
+                                <p>{{ activity.startDate|date('H:i') }}H</p>
+                                <p>{{ activity.endDate|date('H:i') }}H</p>
                             </div>
-                            {% set totalCostActivity = totalCostActivity + activity.activity.cost %}
-                            {% endif %}
-                            {% endfor %}
+                            <div class="event-right">
+                                <p>{{ activity.activity.name }}</p>
+                                <p>{{ activity.activity.description }}</p>
+                                <p>Coût: {{ activity.activity.cost }} €</p>
+                            </div>
                         </div>
+                        {% set totalCostActivity = totalCostActivity + activity.activity.cost %}
+                        {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
-                {% set current_date = current_date|date_modify('+1 day') %}
-                {% endfor %}
             </div>
-            <div class="swiper-pagination"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
+            {% set current_date = current_date|date_modify('+1 day') %}
+            {% endfor %}
         </div>
-        
-        <div id="activityModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Ajouter une activité</h2>
-                <form id="addActivityForm">
-                    <input type="text" id="activityName" placeholder="Nom de l'activité" required>
-                    <textarea id="activityDescription" placeholder="Description"></textarea>
-                    <input type="number" id="activityCost" placeholder="Coût">
-                    <input type="datetime-local" id="activityStartDate" required>
-                    <input type="datetime-local" id="activityEndDate" required>
-                    <button type="submit">Ajouter</button>
-                </form>
-            </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+    
+    <div id="activityModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ajouter une activité</h2>
+            <form id="addActivityForm">
+                <input type="text" id="activityName" placeholder="Nom de l'activité" required>
+                <textarea id="activityDescription" placeholder="Description"></textarea>
+                <input type="number" id="activityCost" placeholder="Coût">
+                <input type="datetime-local" id="activityStartDate" required>
+                <input type="datetime-local" id="activityEndDate" required>
+                <button type="submit">Ajouter</button>
+            </form>
         </div>
     </div>
-    <a href="{{ path('app_trip_index') }}">Retour à la liste</a>
-        <a href="{{ path('app_trip_edit', {'id': trip.id}) }}">Modifier</a>
-        {{ include('trip/_delete_form.html.twig') }}
+</div>
+
+<a href="{{ path('app_trip_index') }}">Retour à la liste</a>
+<a href="{{ path('app_trip_edit', {'id': trip.id}) }}">Modifier</a>
+{{ include('trip/_delete_form.html.twig') }}
 {% endblock %}
 
 {% block javascripts %}
@@ -89,10 +93,9 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-
         $(document).ready(function() {
             var swiper = new Swiper(".mySwiper", {
-                slidesPerView: 7,
+                slidesPerView: 6,
                 spaceBetween: 30,
                 navigation: {
                     nextEl: ".swiper-button-next",
@@ -105,12 +108,12 @@
                 mousewheel: false,
                 keyboard: true,
             });
+
             let totalCostActivity = {{ totalCostActivity }};
             $('#totalExpense').text(totalCostActivity + ' €');
 
             $('.add-activity').on('click', function() {
                 $('#activityModal').show();
-                // Utilisez la date de début du voyage comme date par défaut
                 const defaultDate = new Date('{{ trip.startDate|date('Y-m-d') }}');
                 const formattedDate = defaultDate.toISOString().split('T')[0];
                 $('#activityStartDate').val(formattedDate + 'T09:00');
@@ -137,7 +140,7 @@
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
-                    javascriptCopysuccess: function(response) {
+                    success: function(response) {
                         try {
                             if (response && response.startDate && response.endDate && response.name && response.description && response.cost !== undefined) {
                                 const startTime = response.startDate.split('T')[1].substring(0, 5);
@@ -145,8 +148,6 @@
                                 
                                 const activityDate = new Date(response.startDate);
                                 const formattedDate = activityDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
-                    
-                                console.log('Date formatée de l\'activité:', formattedDate);
                     
                                 const dayColumn = $('.day').filter(function() {
                                     return $(this).find('.date-day').text().trim() === formattedDate;
@@ -193,5 +194,3 @@
         });
     </script>
 {% endblock %}
-
-        

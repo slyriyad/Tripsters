@@ -11,27 +11,25 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class ExpenseType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('amount',IntegerType::class)
-            ->add('description',TextType::class)
-            ->add('name',TextType::class)
-            ->add('date', DateType::class, [
-                'widget' => 'single_text',
-                'format' => 'yyyy-MM-dd',
-                'html5' => true,
-            ])
+            ->add('name', TextType::class, ['label' => 'Nom de la dépense'])
+            ->add('amount', MoneyType::class, ['label' => 'Montant', 'divisor' => 100])
+            ->add('description', TextareaType::class, ['label' => 'Description', 'required' => false])
             ->add('categoryExpense', EntityType::class, [
                 'class' => CategoryExpense::class,
-                'choice_label' => 'id',
-            ])
-        ;
+                'choice_label' => 'name',
+                'label' => 'Catégorie',
+                'required' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -1,11 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Expense{% endblock %}
+{% block title %}Nouvelle dépense pour {{ trip.name }}{% endblock %}
 
 {% block body %}
-    <h1>Create new Expense</h1>
+    <h1>Nouvelle dépense pour {{ trip.name }}</h1>
 
-    {{ include('expense/_form.html.twig') }}
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-primary">Créer la dépense</button>
+    {{ form_end(form) }}
 
-    <a href="{{ path('app_expense_index') }}">back to list</a>
+    <a href="{{ path('app_trip_show', {'id': trip.id}) }}" class="btn btn-secondary">Retour au voyage</a>
 {% endblock %}

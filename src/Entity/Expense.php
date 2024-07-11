@@ -37,21 +37,7 @@ class Expense
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\ManyToOne(inversedBy: 'paidExpenses')]
-    private ?User $paidBy = null;
 
-
-    /**
-     * @var Collection<int, ExpenseSplit>
-     */
-    #[ORM\OneToMany(mappedBy: 'expense', targetEntity: ExpenseSplit::class, cascade: ['persist', 'remove'])]
-    private Collection $expenseSplits;
-
-
-    public function __construct()
-    {
-        $this->expenseSplits = new ArrayCollection();
-    }
 
 
     public function getId(): ?int
@@ -130,56 +116,6 @@ class Expense
     public function setDate(\DateTimeInterface $date): static
     {
         $this->date = $date;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ExpenseSplit>
-     */
-    public function getExpenseSplits(): Collection
-    {
-        return $this->expenseSplits;
-    }
-
-    public function addExpenseSplit(ExpenseSplit $expenseSplit): static
-    {
-        if (!$this->expenseSplits->contains($expenseSplit)) {
-            $this->expenseSplits->add($expenseSplit);
-            $expenseSplit->setExpense($this);
-        }
-
-        return $this;
-    }
-
-    public function removeExpenseSplit(ExpenseSplit $expenseSplit): static
-    {
-        if ($this->expenseSplits->removeElement($expenseSplit)) {
-            // set the owning side to null (unless already changed)
-            if ($expenseSplit->getExpense() === $this) {
-                $expenseSplit->setExpense(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get the value of paidBy
-     */ 
-    public function getPaidBy()
-    {
-        return $this->paidBy;
-    }
-
-    /**
-     * Set the value of paidBy
-     *
-     * @return  self
-     */ 
-    public function setPaidBy($paidBy)
-    {
-        $this->paidBy = $paidBy;
 
         return $this;
     }

@@ -25,49 +25,11 @@ class ExpenseController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_expense_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $expense = new Expense();
-        $form = $this->createForm(ExpenseType::class, $expense);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($expense);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_expense_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('expense/new.html.twig', [
-            'expense' => $expense,
-            'form' => $form,
-        ]);
-    }
-
     #[Route('/{id}', name: 'app_expense_show', methods: ['GET'])]
     public function show(Expense $expense): Response
     {
         return $this->render('expense/show.html.twig', [
             'expense' => $expense,
-        ]);
-    }
-
-    #[Route('/{id}/edit', name: 'app_expense_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Expense $expense, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(ExpenseType::class, $expense);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_expense_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('expense/edit.html.twig', [
-            'expense' => $expense,
-            'form' => $form,
         ]);
     }
 
@@ -82,45 +44,52 @@ class ExpenseController extends AbstractController
         return $this->redirectToRoute('app_expense_index', [], Response::HTTP_SEE_OTHER);
     }
     
-    #[Route('/trip/{tripId}/expense/add', name: 'app_expense_add', methods: ['GET', 'POST'])]
-    public function addExpense(Request $request, int $tripId, EntityManagerInterface $entityManager, TripRepository $tripRepository): Response
+    #[Route('/expense/{id}/edit', name: 'app_expense_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Expense $expense, EntityManagerInterface $entityManager): Response
     {
-        $trip = $tripRepository->find($tripId);
-        if (!$trip) {
-            throw $this->createNotFoundException('Trip not found');
-        }
-        
-        $expense = new Expense();
-        $expense->setTrip($trip);
-        $expense->setPaidBy($this->getUser()); 
-        
         $form = $this->createForm(ExpenseType::class, $expense);
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-           
-            $splitAmount = $expense->getAmount() / count($trip->getParticipants());
-            foreach ($trip->getParticipants() as $participant) {
-                $split = new ExpenseSplit();
-                $split->setExpense($expense);
-                $split->setUser($participant);
-                $split->setAmount($splitAmount);
-                $expense->addExpenseSplit($split);
-            }
-            
-            $entityManager->persist($expense);
             $entityManager->flush();
             
-            return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
+            $this->addFlash('success', 'La dépense a été mise à jour et répartie automatiquement.');
+            return $this->redirectToRoute('app_expense_show', ['id' => $expense->getId()]);
         }
-
-        return $this->render('expense/new_modal.html.twig', [
+        
+        return $this->render('expense/edit.html.twig', [
             'expense' => $expense,
             'form' => $form->createView(),
         ]);
     }
 
-    
+    #[Route('/new/{tripId}', name: 'app_expense_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager, TripRepository $tripRepository, int $tripId): Response
+    {
+        $trip = $tripRepository->find($tripId);
+        if (!$trip) {
+            throw $this->createNotFoundException('Le voyage demandé n\'existe pas.');
+        }
+
+        $expense = new Expense();
+        $expense->setTrip($trip);
+        $expense->setDate(new \DateTime());
+
+        $form = $this->createForm(ExpenseType::class, $expense);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($expense);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'La dépense a été créée et répartie automatiquement.');
+            return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
+        }
+
+        return $this->render('expense/new.html.twig', [
+            'expense' => $expense,
+            'form' => $form->createView(),
+            'trip' => $trip,
+        ]);
+    }
 }
-    
-    
