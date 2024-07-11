@@ -41,7 +41,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: TripUser::class, mappedBy: 'user')]
     private Collection $tripUsers;
 
-    
+    #[ORM\Column(length: 255)]
+    private ?string $avatar = null;
+
+    private ?string $avatarFilename = null;
+
+    public function getAvatarFilename(): ?string
+    {
+        return $this->avatarFilename;
+    }
+
+    public function setAvatarFilename(?string $avatarFilename): self
+    {
+        $this->avatarFilename = $avatarFilename;
+        return $this;
+    }
 
     public function __construct()
     {
@@ -149,6 +163,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $tripUser->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(string $avatar): static
+    {
+        $this->avatar = $avatar;
 
         return $this;
     }

@@ -41,7 +41,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  font-size: 1vw;
+  font-size: 15px;
   background-color: #6f6fff;
   height: 180px;
   border-radius: 15px;
@@ -229,7 +229,7 @@ h1, h2, h3 {
 }
 
 .event {
-  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(to right, var(--primary-color), black);
   color: white;
   border-radius: 8px;
   padding: 10px;
@@ -267,10 +267,10 @@ h1, h2, h3 {
 
 .cards {
   flex: 0 0 35%;
-  background-color: white;
+  background-color: #3498db;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 00px;
 }
 
 .swiper-button-next, .swiper-button-prev {
