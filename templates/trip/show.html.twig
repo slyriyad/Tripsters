@@ -18,18 +18,25 @@
     <div class="cards">
         <div class="card" id="budgetCard">
             <h2>Budget</h2>
-            <p>{{ trip.budget }} €</p> 
-        </div>
-        <div class="card" id="expenseCard">  
+            <p>{{ trip.budget }} €</p>  
             <h2>Dépense</h2>
             <p id="totalExpense">0 €</p>
-        </div>
+        </div>  
+            <svg viewBox="0 0 36 36" class="circle-svg">
+  
+                <path class="around" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                
+                <path class="percent" stroke-dasharray="{{totalCostActivity / trip.budget  * 100}}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                
+                <text x="18" y="14" text-anchor="middle" dy="7" font-size="20">{{(totalCostActivity / trip.budget  * 100)|round(1, 'floor')}} %</text>
+                
+              </svg>
     </div>
 </div>
 <button class="add-activity">Ajouter une activité</button>
 <div class="calendar">
     <div class="swiper mySwiper" style="min-height:500px">
-        <div class="swiper-wrapper">
+        <div class="swiper-wrapper" style="min-height:500px">
             {% set totalCostActivity = 0 %}
             {% set current_date = trip.startDate %}
             {% for i in 0..days %}
@@ -81,6 +88,9 @@
             </form>
         </div>
     </div>
+    {% if trip.tripActivities|length > 4 %}
+  <div class="see-more">Voir plus ({{ trip.tripActivities|length - 4 }} autres)</div>
+{% endif %}
 </div>
 
 <a href="{{ path('app_trip_index') }}">Retour à la liste</a>
@@ -174,6 +184,10 @@
                                     $('#activityModal').hide();
                                     $('#addActivityForm')[0].reset();
                                     swiper.update();
+                                    swiper.updateSlides();
+                                    swiper.updateProgress();
+                                    swiper.updateSlidesClasses();
+                                    
                                 } else {
                                     console.error('Colonne du jour non trouvée pour la date:', formattedDate);
                                     alert('Impossible d\'ajouter l\'activité. La date est en dehors de la période du voyage.');
