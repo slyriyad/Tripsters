@@ -34,6 +34,9 @@ class Activity
     #[ORM\OneToMany(targetEntity: TripActivity::class, mappedBy: 'activity')]
     private Collection $tripActivities;
 
+    #[ORM\ManyToOne(inversedBy: 'activities')]
+    private ?user $createdBy = null;
+
     public function __construct()
     {
         $this->tripActivities = new ArrayCollection();
@@ -118,6 +121,18 @@ class Activity
                 $tripActivity->setActivity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?user
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?user $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

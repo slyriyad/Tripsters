@@ -101,39 +101,51 @@ class TripController extends AbstractController
     }
 
     #[Route('/{tripId}/add-activity', name: 'trip_add_activity', methods: ['POST'])]
-    public function addActivity(Request $request, int $tripId, TripRepository $tripRepository, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $trip = $tripRepository->find($tripId);
-        if (!$trip) {
-            return new JsonResponse(['error' => 'Trip not found'], 404);
-        }
-
-        $data = json_decode($request->getContent(), true);
-
-        $activity = new Activity();
-        $activity->setName($data['name']);
-        $activity->setDescription($data['description']);
-        $activity->setCost($data['cost']);
-
-        $tripActivity = new TripActivity();
-        $tripActivity->setTrip($trip);
-        $tripActivity->setActivity($activity);
-        $tripActivity->setStartDate(new \DateTime($data['startDate']));
-        $tripActivity->setEndDate(new \DateTime($data['endDate']));
-
-        $entityManager->persist($activity);
-        $entityManager->persist($tripActivity);
-        $entityManager->flush();
-
-        return new JsonResponse([
-            'id' => $tripActivity->getId(),
-            'name' => $activity->getName(),
-            'description' => $activity->getDescription(),
-            'cost' => $activity->getCost(),
-            'startDate' => $tripActivity->getStartDate()->format('Y-m-d H:i:s'),
-            'endDate' => $tripActivity->getEndDate()->format('Y-m-d H:i:s'),
-        ]);
+public function addActivity(Request $request, int $tripId, TripRepository $tripRepository, EntityManagerInterface $entityManager): JsonResponse
+{
+    $trip = $tripRepository->find($tripId);
+    if (!$trip) {
+        return new JsonResponse(['error' => 'Trip not found'], 404);
     }
+
+    $data = json_decode($request->getContent(), true);
+
+    $activity = new Activity();
+    $activity->setName($data['name']);
+    $activity->setDescription($data['description']);
+    $activity->setCost($data['cost']);
+    $activity->setCreatedBy($this->getUser());  // Ajoutez cette ligne
+
+    $tripActivity = new TripActivity();
+    $tripActivity->setTrip($trip);
+    $tripActivity->setActivity($activity);
+    $tripActivity->setStartDate(new \DateTime($data['startDate']));
+    $tripActivity->setEndDate(new \DateTime($data['endDate']));
+
+    $entityManager->persist($activity);
+    $entityManager->persist($tripActivity);
+    $entityManager->flush();
+
+    $createdBy = $activity->getCreatedBy();
+    $profilePicture = null;
+    if ($createdBy && $createdBy->getImageName()) {
+        $profilePicture = $this->getParameter('app.path.avatars') . '/' . $createdBy->getImageName();
+    }
+
+    return new JsonResponse([
+        'id' => $tripActivity->getId(),
+        'name' => $activity->getName(),
+        'description' => $activity->getDescription(),
+        'cost' => $activity->getCost(),
+        'startDate' => $tripActivity->getStartDate()->format('Y-m-d H:i:s'),
+        'endDate' => $tripActivity->getEndDate()->format('Y-m-d H:i:s'),
+        'createdBy' => [
+            'id' => $createdBy ? $createdBy->getId() : null,
+            'email' => $createdBy ? $createdBy->getEmail() : null,
+            'profilePicture' => $profilePicture,
+        ],
+    ]);
+}
 
     #[Route('/{id}/balances', name: 'app_trip_balances', methods: ['GET'])]
     public function showBalances(Trip $trip, ExpenseRepository $expenseRepository): Response

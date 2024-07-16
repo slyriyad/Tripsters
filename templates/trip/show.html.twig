@@ -46,6 +46,13 @@
                         {% for activity in trip.tripActivities %}
                         {% if activity.startDate|date('d-m-Y') <= current_date|date('d-m-Y') and activity.endDate|date('d-m-Y') >= current_date|date('d-m-Y') %}
                         <div class="event">
+                            {% if activity.activity.createdBy and activity.activity.createdBy.imageName %}
+                            <img src="{{ asset('uploads/avatars/' ~ activity.activity.createdBy.imageName) }}" alt="{{ activity.activity.createdBy.email }}" class="profile-picture">
+                        {% else %}
+                            <div class="profile-picture default-avatar">
+                                {{ activity.activity.createdBy ? activity.activity.createdBy.email|first|upper : 'U' }}
+                            </div>
+                        {% endif %}
                             <div class="event-left">
                                 <p>{{ activity.startDate|date('H:i') }}H</p>
                                 <p>{{ activity.endDate|date('H:i') }}H</p>
@@ -101,7 +108,7 @@
     <script>
         $(document).ready(function() {
             var swiper = new Swiper(".mySwiper", {
-                slidesPerView: 6,
+                slidesPerView: 4,
                 spaceBetween: 30,
                 navigation: {
                     nextEl: ".swiper-button-next",
