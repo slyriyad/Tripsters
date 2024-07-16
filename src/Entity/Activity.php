@@ -35,7 +35,7 @@ class Activity
     private Collection $tripActivities;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
-    private ?user $createdBy = null;
+    private ?User $createdBy = null;
 
     public function __construct()
     {
@@ -125,12 +125,12 @@ class Activity
         return $this;
     }
 
-    public function getCreatedBy(): ?user
+    public function getCreatedBy(): ?User
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(?user $createdBy): static
+    public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
 

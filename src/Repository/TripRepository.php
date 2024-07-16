@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Trip;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\TripUser;
+use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Trip>
@@ -40,4 +42,17 @@ class TripRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+// Dans src/Repository/TripRepository.php
+public function findTripsByUser(User $user)
+{
+    return $this->createQueryBuilder('t')
+        ->innerJoin('t.tripUsers', 'tu')  // Supposons que 'tripUsers' est le nom de la relation dans l'entité Trip
+        ->innerJoin('tu.user', 'u')       // Jointure avec l'entité User via TripUser
+        ->andWhere('u = :user')           // Utilisation directe de l'objet User
+        ->setParameter('user', $user)
+        ->orderBy('t.startDate', 'DESC')  // J'ai décommenté cette ligne car c'est généralement utile
+        ->getQuery()
+        ->getResult();
+}
 }

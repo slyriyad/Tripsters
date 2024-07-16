@@ -14,7 +14,8 @@
             <p>Du {{ trip.startDate ? trip.startDate|date('d-m-Y') : '' }} au {{ trip.endDate ? trip.endDate|date('d-m-Y') : '' }}</p>
         </div>
     </div>
-
+{# Dans templates/activity/index.html.twig #}
+<a href="{{ path('app_category_activity_new') }}">Créer une nouvelle catégorie</a>
     <div class="cards">
         <div class="card" id="budgetCard">
             <h2>Budget</h2>
@@ -45,7 +46,7 @@
                     <div class="events">
                         {% for activity in trip.tripActivities %}
                         {% if activity.startDate|date('d-m-Y') <= current_date|date('d-m-Y') and activity.endDate|date('d-m-Y') >= current_date|date('d-m-Y') %}
-                        <div class="event">
+                        <div class="event" style="background-color: {{ activity.activity.categoryActivity.backgroundColor }}">
                             {% if activity.activity.createdBy and activity.activity.createdBy.imageName %}
                             <img src="{{ asset('uploads/avatars/' ~ activity.activity.createdBy.imageName) }}" alt="{{ activity.activity.createdBy.email }}" class="profile-picture">
                         {% else %}
@@ -87,6 +88,12 @@
                 <input type="number" id="activityCost" placeholder="Coût">
                 <input type="datetime-local" id="activityStartDate" required>
                 <input type="datetime-local" id="activityEndDate" required>
+                <select id="activityCategory" required>
+                    <option value="">Choisir une catégorie</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" data-color="{{ category.backgroundColor }}">{{ category.nom }}</option>
+                    {% endfor %}
+                </select><br>
                 <button type="submit">Ajouter</button>
             </form>
         </div>
@@ -133,6 +140,7 @@
                 $('#activityEndDate').val(formattedDate + 'T10:00');
             });
 
+            
             $('.close').on('click', function() {
                 $('#activityModal').hide();
             });
@@ -145,7 +153,8 @@
                     description: $('#activityDescription').val(),
                     cost: parseFloat($('#activityCost').val()),
                     startDate: $('#activityStartDate').val(),
-                    endDate: $('#activityEndDate').val()
+                    endDate: $('#activityEndDate').val(),
+                    categoryId: $('#activityCategory').val()
                 };
 
                 console.log('Submitting form with data:', data);
@@ -170,8 +179,9 @@
                                 });
 
                                 if (dayColumn.length > 0) {
+                                    const categoryColor = response.categoryColor || '#default-color';
                                     const newActivity = `
-                                        <div class="event">
+                                        <div class="event" style="background-color: ${categoryColor}">
                                             <div class="event-left">
                                                 <p>${startTime}H</p>
                                                 <p>${endTime}H</p>
@@ -180,6 +190,7 @@
                                                 <p>${response.name}</p>
                                                 <p>${response.description}</p>
                                                 <p>Coût: ${response.cost} €</p>
+                                                <p>Catégorie: ${response.categoryName || 'Non catégorisé'}</p>
                                             </div>
                                         </div>
                                     `;

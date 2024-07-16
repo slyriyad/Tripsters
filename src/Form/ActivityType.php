@@ -21,7 +21,11 @@ class ActivityType extends AbstractType
             ->add('cost',IntegerType::class)
             ->add('categoryActivity', EntityType::class, [
                 'class' => CategoryActivity::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name', // Supposons que CategoryActivity a un champ 'name'
+                'placeholder' => 'Choisir une catégorie',
+                'required' => true,
+                'multiple' => false,
+                'expanded' => false, // false pour un select, true pour des radio buttons
             ])
         ;
     }

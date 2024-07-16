@@ -92,14 +92,6 @@
   display: none;
 }
 
-.event {
-  position: relative;
-  border-radius: 15px;
-  background: #aaa;
-  height: auto;
-  min-height: 100px;
-  margin: 10px 0;
-}
 
 .event-left {
   display: flex;
@@ -228,13 +220,6 @@ h1, h2, h3 {
   transform: translateY(-5px);
 }
 
-.event {
-  background: linear-gradient(to right, var(--primary-color), black);
-  color: white;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-}
 
 .event-left {
   font-weight: bold;
@@ -314,11 +299,6 @@ h1, h2, h3 {
   border: 3px solid var(--background-color);
 }
 
-.event {
-  padding: 8px;
-  margin-bottom: 8px;
-  font-size: 0.9em;
-}
 
 .see-more {
   text-align: center;
@@ -339,10 +319,14 @@ h1, h2, h3 {
   position: relative;
   padding: 10px 10px 10px 50px; /* Ajustez le padding gauche pour laisser de la place à la photo */
   margin-bottom: 10px;
-  background: linear-gradient(to right, var(--primary-color), #2980b9);
+  /* background: linear-gradient(to right, var(--primary-color), #2980b9); */
   color: white;
   border-radius: 8px;
   overflow: hidden; /* Pour s'assurer que la photo ne déborde pas */
+  height: auto;
+  min-height: 100px;
+  margin: 10px 0;
+  font-size: 0.9em;
 }
 
 .profile-picture,

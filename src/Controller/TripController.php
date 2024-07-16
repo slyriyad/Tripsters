@@ -6,11 +6,14 @@ use App\Entity\Trip;
 use App\Form\TripType;
 use App\Entity\Activity;
 use App\Entity\TripActivity;
+use App\Entity\User;
 use App\Form\TripActivityType;
 use App\Repository\TripRepository;
 use App\Repository\ExpenseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\CategoryActivityRepository;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,10 +25,22 @@ class TripController extends AbstractController
     #[Route('/', name: 'app_trip_index', methods: ['GET'])]
     public function index(TripRepository $tripRepository): Response
     {
+        // Vérifier si l'utilisateur est connecté
+        if (!$this->getUser() instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
+
+
+
+        // Récupérer les voyages de l'utilisateur connecté
+        $trips = $tripRepository->findTripsByUser($this->getUser());
+
+        // Rendre la vue avec les voyages
         return $this->render('trip/index.html.twig', [
-            'trips' => $tripRepository->findAll(),
+            'trips' => $trips,
         ]);
     }
+
 
     #[Route('/new', name: 'app_trip_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -48,8 +63,14 @@ class TripController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_trip_show', methods: ['GET'])]
-    public function show(Trip $trip): Response
+    public function show(Trip $trip, CategoryActivityRepository $categoryRepository): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+        return $this->redirectToRoute('app_login');
+    }
+           
+        
     // Récupérer les activités et dépenses associées au voyage
     $activities = $trip->getTripActivities();
     $startDate = $trip->getStartDate();
@@ -61,12 +82,17 @@ class TripController extends AbstractController
     foreach ($trip->getTripActivities() as $tripActivity) {
         $totalCostActivity += $tripActivity->getActivity()->getCost();
     }
+
+    $categories = $categoryRepository->findAll();
+
         return $this->render('trip/show.html.twig', [
         'trip' => $trip,
         'activities' => $activities,
         'days' => $days,
         'totalCostActivity' => $totalCostActivity,
-        ]);
+        'activities' => $activities,
+        'categories' => $categories,
+    ]);
         
     }
 
@@ -101,7 +127,7 @@ class TripController extends AbstractController
     }
 
     #[Route('/{tripId}/add-activity', name: 'trip_add_activity', methods: ['POST'])]
-public function addActivity(Request $request, int $tripId, TripRepository $tripRepository, EntityManagerInterface $entityManager): JsonResponse
+    public function addActivity(Request $request, int $tripId, TripRepository $tripRepository, CategoryActivityRepository $categoryRepository, EntityManagerInterface $entityManager): JsonResponse
 {
     $trip = $tripRepository->find($tripId);
     if (!$trip) {
@@ -114,7 +140,14 @@ public function addActivity(Request $request, int $tripId, TripRepository $tripR
     $activity->setName($data['name']);
     $activity->setDescription($data['description']);
     $activity->setCost($data['cost']);
-    $activity->setCreatedBy($this->getUser());  // Ajoutez cette ligne
+    $activity->setCreatedBy($this->getUser());  
+
+    if (isset($data['categoryId'])) {
+        $category = $categoryRepository->find($data['categoryId']);
+        if ($category) {
+            $activity->setCategoryActivity($category);
+        }
+    }
 
     $tripActivity = new TripActivity();
     $tripActivity->setTrip($trip);

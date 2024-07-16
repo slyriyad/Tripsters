@@ -24,6 +24,9 @@ class CategoryActivity
     #[ORM\OneToMany(targetEntity: activity::class, mappedBy: 'categoryActivity')]
     private Collection $activities;
 
+    #[ORM\Column(length: 255)]
+    private ?string $backgroundColor = null;
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
@@ -72,6 +75,18 @@ class CategoryActivity
                 $activity->setCategoryActivity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBackgroundColor(): ?string
+    {
+        return $this->backgroundColor;
+    }
+
+    public function setBackgroundColor(string $backgroundColor): static
+    {
+        $this->backgroundColor = $backgroundColor;
 
         return $this;
     }
