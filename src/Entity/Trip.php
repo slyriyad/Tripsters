@@ -5,11 +5,14 @@ namespace App\Entity;
 use App\Repository\TripRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TripRepository::class)]
+#[Vich\Uploadable]
 #[ORM\HasLifecycleCallbacks()]
 
 class Trip
@@ -45,6 +48,16 @@ class Trip
     #[ORM\Column(nullable: true)]
     private ?int $budget = null;
 
+    #[Vich\UploadableField(mapping: 'avatars', fileNameProperty: 'imageName', size: 'imageSize')]
+    private ?File $imageFile = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $imageName = null;
+    
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $imageSize = null;
+    
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $creationDate = null;
 
@@ -66,6 +79,7 @@ class Trip
     #[ORM\OneToMany(targetEntity: Expense::class, mappedBy: 'trip')]
     private Collection $expenses;
 
+   
     public function __construct()
     {
         $this->tripUsers = new ArrayCollection();
@@ -299,6 +313,38 @@ class Trip
             $tripUser->setTrip(null);
         });
         return $this;
+    }
+
+    
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageName(?string $imageName): void
+    {
+        $this->imageName = $imageName;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    public function setImageSize(?int $imageSize): void
+    {
+        $this->imageSize = $imageSize;
+    }
+
+    public function getImageSize(): ?int
+    {
+        return $this->imageSize;
     }
 }
 

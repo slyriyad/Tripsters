@@ -3,12 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Expense;
+use App\Entity\Trip;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Expense>
- */
 class ExpenseRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +14,15 @@ class ExpenseRepository extends ServiceEntityRepository
         parent::__construct($registry, Expense::class);
     }
 
-    //    /**
-    //     * @return Expense[] Returns an array of Expense objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('e.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Expense
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function getSumByCategory(Trip $trip)
+{
+    $qb = $this->getEntityManager()->createQueryBuilder();
+    return $qb->select('ce.name as categoryName, ce.backgroundColor, ce.icon, COALESCE(SUM(e.amount), 0) as total')
+        ->from('App\Entity\CategoryExpense', 'ce')
+        ->leftJoin('App\Entity\Expense', 'e', 'WITH', 'e.categoryExpense = ce AND e.trip = :trip')
+        ->setParameter('trip', $trip)
+        ->groupBy('ce.id')
+        ->getQuery()
+        ->getResult();
+}
 }

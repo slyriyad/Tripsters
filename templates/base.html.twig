@@ -23,8 +23,9 @@
             <ul>
             {% if is_granted('ROLE_USER') %}
                 <li><a href="{{ path('app_trip_index') }}"><i class="fa-solid fa-house"></i></a></li>
-                <li><a href="{{ path('app_trip_index') }}"><i class="fa-regular fa-calendar"></i></a></li>          
-                <li><a href="{{ path('app_expense_index', {'tripId': trip.id}) }}"><i class="fa-solid fa-sack-dollar"></i></a></li>
+                <li><a href="{{ path('app_trip_index') }}"><i class="fa-regular fa-calendar"></i></a></li> 
+                {% block extra_nav %}{% endblock %}         
+              
 
             {% endif %}
                 {% if app.user %}

@@ -8,6 +8,7 @@ use App\Form\TripType;
 use App\Entity\Comment;
 use App\Entity\Expense;
 use App\Entity\Activity;
+use App\Entity\TripUser;
 use App\Form\CommentType;
 use App\Form\ExpenseType;
 use App\Entity\TripActivity;
@@ -16,6 +17,7 @@ use Doctrine\ORM\EntityManager;
 use App\Repository\TripRepository;
 use App\Repository\ExpenseRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\CategoryExpenseRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CategoryActivityRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,9 +56,21 @@ class TripController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            
             $entityManager->persist($trip);
+    
+            // Créez une nouvelle instance de TripUser
+            $tripUser = new TripUser();// Créez une nouvelle instance de TripUser
+            $tripUser->setTrip($trip);// Définir le voyage pour le TripUser
+            $tripUser->setUser($this->getUser()); // Définir l'utilisateur connecté pour le TripUser
+    
+            
+            $entityManager->persist($tripUser);
+    
+            
             $entityManager->flush();
-
+    
+            $this->addFlash('success', 'Voyage créé avec succès !');
             return $this->redirectToRoute('app_trip_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -254,13 +268,26 @@ class TripController extends AbstractController
     }
 
     #[Route('/{tripId}/expenses', name: 'app_expense_index', methods: ['GET', 'POST'])]
-    public function indexexpense(Request $request, int $tripId, ExpenseRepository $expenseRepository, EntityManagerInterface $entityManager): Response
+    public function indexexpense(Request $request, int $tripId, ExpenseRepository $expenseRepository,CategoryExpenseRepository $categoryRepository,EntityManagerInterface $entityManager): Response
     {
         $trip = $entityManager->getRepository(Trip::class)->find($tripId);
         
         if (!$trip) {
             throw $this->createNotFoundException('Le voyage demandé n\'existe pas.');
         }
+        $expensesByCategory = $expenseRepository->getSumByCategory($trip);
+        
+        $totalExpenses = array_sum(array_column($expensesByCategory, 'total'));
+
+        $recentExpenses = $expenseRepository->findBy(['trip' => $trip], ['date' => 'DESC'], 5);
+
+        $allCategories = $categoryRepository->findAll();
+
+        $totalCostActivity = 0;
+        foreach ($trip->getTripActivities() as $tripActivity) {
+            $totalCostActivity += $tripActivity->getActivity()->getCost();
+        }
+
 
         $expense = new Expense();
         $expense->setTrip($trip);
@@ -280,6 +307,11 @@ class TripController extends AbstractController
             'expenses' => $expenseRepository->findBy(['trip' => $trip]),
             'expenseForm' => $form->createView(),
             'trip' => $trip,
+            'expensesByCategory' => $expensesByCategory,
+            'totalExpenses' => $totalExpenses,
+            'recentExpenses' => $recentExpenses,
+            'totalCostActivity' => $totalCostActivity,
+            'allCategories' => $allCategories, 
         ]);
     }
 }

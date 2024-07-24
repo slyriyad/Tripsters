@@ -27,6 +27,9 @@ class CategoryExpense
     #[ORM\Column(length: 255)]
     private ?string $icon = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $backgroundColor = null;
+
     public function __construct()
     {
         $this->expenses = new ArrayCollection();
@@ -87,6 +90,18 @@ class CategoryExpense
     public function setIcon(string $icon): static
     {
         $this->icon = $icon;
+
+        return $this;
+    }
+
+    public function getBackgroundColor(): ?string
+    {
+        return $this->backgroundColor;
+    }
+
+    public function setBackgroundColor(string $backgroundColor): static
+    {
+        $this->backgroundColor = $backgroundColor;
 
         return $this;
     }
