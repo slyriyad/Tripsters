@@ -27,6 +27,7 @@ class CategoryActivity
     #[ORM\Column(length: 255)]
     private ?string $backgroundColor = null;
 
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
@@ -90,4 +91,6 @@ class CategoryActivity
 
         return $this;
     }
+
+
 }

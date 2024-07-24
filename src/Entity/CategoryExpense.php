@@ -24,6 +24,9 @@ class CategoryExpense
     #[ORM\OneToMany(targetEntity: expense::class, mappedBy: 'categoryExpense')]
     private Collection $expenses;
 
+    #[ORM\Column(length: 255)]
+    private ?string $icon = null;
+
     public function __construct()
     {
         $this->expenses = new ArrayCollection();
@@ -72,6 +75,18 @@ class CategoryExpense
                 $expense->setCategoryExpense(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(string $icon): static
+    {
+        $this->icon = $icon;
 
         return $this;
     }

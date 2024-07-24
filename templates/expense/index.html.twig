@@ -1,42 +1,51 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Expense index{% endblock %}
+{% block title %}Gestion des dépenses pour {{ trip.name }}{% endblock %}
 
 {% block body %}
-    <h1>Expense index</h1>
+    <h1>Gestion des dépenses pour {{ trip.name }}</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Amount</th>
-                <th>Descrition</th>
-                <th>Name</th>
-                <th>Date</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for expense in expenses %}
-            <tr>
-                <td>{{ expense.id }}</td>
-                <td>{{ expense.amount }}</td>
-                <td>{{ expense.description }}</td>
-                <td>{{ expense.name }}</td>
-                <td>{{ expense.date ? expense.date|date('Y-m-d') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_expense_show', {'id': expense.id}) }}">show</a>
-                    <a href="{{ path('app_expense_edit', {'id': expense.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {# {% if is_granted('ROLE_USER') %}
-        <a href="{{ path('app_expense_new') }}">Create new</a>
-    {% endif %} #}
+    <section class="expense-list">
+        <h2>Liste des dépenses</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Montant</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Catégorie</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.name }}</td>
+                    <td>{{ expense.amount }}€</td>
+                    <td>{{ expense.description }}</td>
+                    <td>{{ expense.date ? expense.date|date('Y-m-d') : '' }}</td>
+                    <td>{{ expense.categoryExpense ? expense.categoryExpense.name : 'N/A' }}</td>
+                    <td>
+                        <a href="{{ path('app_expense_show', {'id': expense.id}) }}">Voir</a>
+                        <a href="{{ path('app_expense_edit', {'id': expense.id}) }}">Modifier</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">Aucune dépense trouvée</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="add-expense">
+        <h2>Ajouter une dépense</h2>
+        {{ form_start(expenseForm) }}
+            {{ form_widget(expenseForm) }}
+            <button type="submit" class="btn btn-primary">Ajouter la dépense</button>
+        {{ form_end(expenseForm) }}
+    </section>
+</main>
 {% endblock %}

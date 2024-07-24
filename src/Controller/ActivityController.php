@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\Activity;
+use App\Form\CommentType;
 use App\Form\ActivityType;
 use App\Entity\CategoryActivity;
 use App\Form\CategoryActivityType;
@@ -44,13 +46,29 @@ class ActivityController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_activity_show', methods: ['GET'])]
-    public function show(Activity $activity): Response
-    {
-        return $this->render('activity/show.html.twig', [
-            'activity' => $activity,
-        ]);
-    }
+    // #[Route('/{id}', name: 'app_activity_show', methods: ['GET', 'POST'])]
+    // public function show(Request $request, Activity $activity, EntityManagerInterface $entityManager): Response
+    // {
+    //     $comment = new Comment();
+    //     $form = $this->createForm(CommentType::class, $comment);
+    //     $form->handleRequest($request);
+
+    //     if ($form->isSubmitted() && $form->isValid()) {
+    //         $comment->setAuthor($this->getUser());
+    //         $comment->setActivity($activity);
+    //         $comment->setCreatedAt(new \DateTime());
+    //         $entityManager->persist($comment);
+    //         $entityManager->flush();
+
+    //         $this->addFlash('success', 'Votre commentaire a été ajouté.');
+    //         return $this->redirectToRoute('app_activity_show', ['id' => $activity->getId()]);
+    //     }
+
+    //     return $this->render('activity/show.html.twig', [
+    //         'activity' => $activity,
+    //         'commentForm' => $form->createView(),
+    //     ]);
+    // }
 
     #[Route('/{id}/edit', name: 'app_activity_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Activity $activity, EntityManagerInterface $entityManager): Response

@@ -46,7 +46,7 @@
                     <div class="events">
                         {% for activity in trip.tripActivities %}
                         {% if activity.startDate|date('d-m-Y') <= current_date|date('d-m-Y') and activity.endDate|date('d-m-Y') >= current_date|date('d-m-Y') %}
-                        <div class="event" style="background-color: {{ activity.activity.categoryActivity.backgroundColor }}">
+                        <div class="event" style="background-color: {{ activity.activity.categoryActivity.backgroundColor }}">                            <a href="{{ path('app_activity_show', {'id': activity.activity.id}) }}">
                             {% if activity.activity.createdBy and activity.activity.createdBy.imageName %}
                             <img src="{{ asset('uploads/avatars/' ~ activity.activity.createdBy.imageName) }}" alt="{{ activity.activity.createdBy.email }}" class="profile-picture">
                         {% else %}
@@ -63,6 +63,7 @@
                                 <p>{{ activity.activity.description }}</p>
                                 <p>Coût: {{ activity.activity.cost }} €</p>
                             </div>
+                        </a>
                         </div>
                         {% set totalCostActivity = totalCostActivity + activity.activity.cost %}
                         {% endif %}

@@ -3,17 +3,21 @@
 namespace App\Controller;
 
 use App\Entity\Trip;
-use App\Form\TripType;
-use App\Entity\Activity;
-use App\Entity\TripActivity;
 use App\Entity\User;
+use App\Form\TripType;
+use App\Entity\Comment;
+use App\Entity\Expense;
+use App\Entity\Activity;
+use App\Form\CommentType;
+use App\Form\ExpenseType;
+use App\Entity\TripActivity;
 use App\Form\TripActivityType;
+use Doctrine\ORM\EntityManager;
 use App\Repository\TripRepository;
 use App\Repository\ExpenseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CategoryActivityRepository;
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -223,5 +227,59 @@ class TripController extends AbstractController
     }
 
     return $balances;
+    }
+
+    #[Route('/activity/{id}', name: 'app_activity_show', methods: ['GET', 'POST'])]
+    public function showAct(Request $request, Activity $activity, EntityManagerInterface $entityManager): Response
+    {
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment->setAuthor($this->getUser());
+            $comment->setActivity($activity);
+            $comment->setCreatedAt(new \DateTime());
+            $entityManager->persist($comment);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre commentaire a été ajouté.');
+            return $this->redirectToRoute('app_activity_show', ['id' => $activity->getId()]);
+        }
+
+        return $this->render('activity/show.html.twig', [
+            'activity' => $activity,
+            'commentForm' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/{tripId}/expenses', name: 'app_expense_index', methods: ['GET', 'POST'])]
+    public function indexexpense(Request $request, int $tripId, ExpenseRepository $expenseRepository, EntityManagerInterface $entityManager): Response
+    {
+        $trip = $entityManager->getRepository(Trip::class)->find($tripId);
+        
+        if (!$trip) {
+            throw $this->createNotFoundException('Le voyage demandé n\'existe pas.');
+        }
+
+        $expense = new Expense();
+        $expense->setTrip($trip);
+        
+        $form = $this->createForm(ExpenseType::class, $expense);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($expense);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Dépense ajoutée avec succès.');
+            return $this->redirectToRoute('app_expense_index', ['tripId' => $tripId]);
+        }
+
+        return $this->render('expense/index.html.twig', [
+            'expenses' => $expenseRepository->findBy(['trip' => $trip]),
+            'expenseForm' => $form->createView(),
+            'trip' => $trip,
+        ]);
     }
 }

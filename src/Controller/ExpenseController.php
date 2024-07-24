@@ -9,6 +9,7 @@ use App\Entity\ExpenseSplit;
 use App\Repository\TripRepository;
 use App\Repository\ExpenseRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\CategoryExpenseRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,13 +18,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/expense')]
 class ExpenseController extends AbstractController
 {
-    #[Route('/', name: 'app_expense_index', methods: ['GET'])]
-    public function index(ExpenseRepository $expenseRepository): Response
-    {
-        return $this->render('expense/index.html.twig', [
-            'expenses' => $expenseRepository->findAll(),
-        ]);
-    }
+    // 
+
+
+
 
     #[Route('/{id}', name: 'app_expense_show', methods: ['GET'])]
     public function show(Expense $expense): Response

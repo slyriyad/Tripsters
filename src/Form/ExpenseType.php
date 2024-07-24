@@ -22,13 +22,17 @@ class ExpenseType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, ['label' => 'Nom de la dépense'])
-            ->add('amount', MoneyType::class, ['label' => 'Montant', 'divisor' => 100])
+            ->add('amount', MoneyType::class, ['label' => 'Montant', 'currency' => 'EUR'])
             ->add('description', TextareaType::class, ['label' => 'Description', 'required' => false])
             ->add('categoryExpense', EntityType::class, [
                 'class' => CategoryExpense::class,
                 'choice_label' => 'name',
                 'label' => 'Catégorie',
                 'required' => false,
+            ])
+            ->add('date', DateType::class, [
+                'widget' => 'single_text',
+                'label' => 'Date',
             ]);
     }
 
