@@ -1,6 +1,13 @@
 {% extends 'base.html.twig' %}
+
 {% block extra_nav %}
     <li><a href="{{ path('app_expense_index', {'tripId': trip.id}) }}"><i class="fa-solid fa-sack-dollar"></i></a></li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" integrity="sha384-..." crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 {% endblock %}
 
 {% block title %}Gestion des dépenses pour {{ trip.name }}{% endblock %}
@@ -8,14 +15,15 @@
 {% block body %}
 <div class="up">
     <div class="info-left">
-        <img src="https://wallpapercave.com/wp/wp3004763.jpg" alt="">
+        <img src="https://wallpapercave.com/wp/wp3004763.jpg" alt="Trip Image">
         <div class="info_trip">
             <h1>{{ trip.name }}</h1>
             <p>Du {{ trip.startDate ? trip.startDate|date('d-m-Y') : '' }} au {{ trip.endDate ? trip.endDate|date('d-m-Y') : '' }}</p>
         </div>
     </div>
-{# Dans templates/activity/index.html.twig #}
-<a href="{{ path('app_category_activity_new') }}">Créer une nouvelle catégorie</a>
+    
+    {# <a href="{{ path('app_category_activity_new') }}" class="btn-create-category">Créer une nouvelle catégorie</a> #}
+
     <div class="cards">
         <div class="card" id="budgetCard">
             <h2>Budget</h2>
@@ -25,26 +33,27 @@
         </div>  
         <svg viewBox="0 0 36 36" class="circle-svg">
             <path class="around" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-            <path class="percent" stroke-dasharray="{{totalCostActivity / trip.budget  * 100}}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-            <text x="18" y="14" text-anchor="middle" dy="7" font-size="20">{{(totalCostActivity / trip.budget  * 100)|round(1, 'floor')}} %</text>
+            <path class="percent" stroke-dasharray="{{ totalCostActivity / trip.budget  * 100 }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+            <text x="18" y="14" text-anchor="middle" dy="7" font-size="20">{{ (totalCostActivity / trip.budget * 100)|round(1, 'floor') }} %</text>
         </svg>
     </div>
 </div>
 
-    
-    <div class="expense-categories">
-        {% for categoryExpense in expensesByCategory %}
-            <div class="category-card" style="background-color: {{ categoryExpense.backgroundColor }};">
-                <i class="{{ categoryExpense.icon }}"></i>
-                <h4>{{ categoryExpense.categoryName }}</h4>
-                <p>{{ categoryExpense.total|number_format(2, ',', ' ') }} €</p>
-            </div>
-            {% endfor %}
-    </div>
+<div class="expense-categories">
+    {% for categoryExpense in expensesByCategory %}
+        <div class="category-card" style="background-color: {{ categoryExpense.backgroundColor }};">
+            <i class="{{ categoryExpense.icon }}"></i>
+            <h4>{{ categoryExpense.categoryName }}</h4>
+            <p>{{ categoryExpense.total|number_format(2, ',', ' ') }} €</p>
+        </div>
+    {% endfor %}
+</div>
+
 <div class="down">
     <div class="recent-expenses">
+        <h3>Dépenses récentes</h3>
         {% for expense in recentExpenses %}
-            <div class="expense-item" >
+            <div class="expense-item">
                 <div class="icon" style="background-color: {{ expense.categoryExpense.backgroundColor }};">
                     <i class="{{ expense.categoryExpense.icon }}"></i>
                 </div>
@@ -65,53 +74,19 @@
             {{ form_row(expenseForm.date) }}
             {{ form_row(expenseForm.categoryExpense) }}
             <button type="submit" class="btn-add">Ajouter</button>
-            {{ form_end(expenseForm) }}
-        </div>
+        {{ form_end(expenseForm) }}
+    </div>
 </div>
-</div>  
 {% endblock %}
+
 {% block javascripts %}
     {{ parent() }}
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
     <script>
+        $(document).ready(function() {
             let totalCostActivity = {{ totalCostActivity }};
             $('#totalExpense').text(totalCostActivity + ' €');
-
-            
+        });
     </script>
 {% endblock %}
-{# <section class="expense-list">
-    <h2>Liste des dépenses</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Montant</th>
-                <th>Description</th>
-                <th>Date</th>
-                <th>Catégorie</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for expense in expenses %}
-            <tr>
-                <td>{{ expense.name }}</td>
-                <td>{{ expense.amount }}€</td>
-                <td>{{ expense.description }}</td>
-                <td>{{ expense.date ? expense.date|date('Y-m-d') : '' }}</td>
-                <td>{{ expense.categoryExpense ? expense.categoryExpense.name : 'N/A' }}</td>
-                <td>
-                    <a href="{{ path('app_expense_show', {'id': expense.id}) }}">Voir</a>
-                    <a href="{{ path('app_expense_edit', {'id': expense.id}) }}">Modifier</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">Aucune dépense trouvée</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</section> #}

@@ -1,42 +1,153 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Activity{% endblock %}
+{% block title %}{{ activity.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .activity-details {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .activity-details p {
+            margin: 10px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        .comment {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .comment-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .comment-info {
+            font-size: 0.9em;
+        }
+        .comment-content {
+            margin-top: 10px;
+        }
+        .comment-form {
+            margin-top: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .btn-primary {
+            background-color: #2ecc71;
+        }
+        .btn-primary:hover {
+            background-color: #27ae60;
+        }
+        .action-buttons {
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
+<div class="container">
     <h1>{{ activity.name }}</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Description</th>
-                <td>{{ activity.description }}</td>
-            </tr>
-            <tr>
-                <th>Cost</th>
-                <td>{{ activity.cost }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="activity-details">
+        <p><strong>Description:</strong> {{ activity.description }}</p>
+        <p><strong>Coût:</strong> {{ activity.cost }} €</p>
+    </div>
 
-    <a href="{{ path('app_activity_index') }}">back to list</a>
-
-    <a href="{{ path('app_activity_edit', {'id': activity.id}) }}">edit</a>
-
-    {{ include('activity/_delete_form.html.twig') }}
+    <div class="action-buttons">
+        <a href="{{ path('app_activity_index') }}" class="btn">Retour à la liste</a>
+        <a href="{{ path('app_activity_edit', {'id': activity.id}) }}" class="btn">Modifier</a>
+        {{ include('activity/_delete_form.html.twig') }}
+    </div>
 
     <h2>Commentaires</h2>
     {% for comment in activity.comments %}
         <div class="comment">
-            <p><strong>{{ comment.author.email }}</strong> - {{ comment.createdAt|date('d/m/Y H:i') }}</p>
-            <p>{{ comment.content }}</p>
+            <div class="comment-header">
+                <img src="{{ asset('uploads/avatars/' ~ comment.author.imageName) }}" alt="Avatar" class="comment-avatar">
+                <div class="comment-info">
+                    <strong>{{ comment.author.email }}</strong><br>
+                    <small>{{ comment.createdAt|date('d/m/Y H:i') }}</small>
+                </div>
+            </div>
+            <div class="comment-content">
+                {{ comment.content|nl2br }}
+            </div>
         </div>
     {% else %}
         <p>Aucun commentaire pour le moment.</p>
     {% endfor %}
 
-    <h3>Ajouter un commentaire</h3>
-    {{ form_start(commentForm) }}
-        {{ form_widget(commentForm) }}
-        <button type="submit" class="btn btn-primary">Envoyer</button>
-    {{ form_end(commentForm) }}
+    <div class="comment-form">
+        <h3>Ajouter un commentaire</h3>
+        {{ form_start(commentForm) }}
+            <div class="form-group">
+                {{ form_widget(commentForm.content, {'attr': {'class': 'form-control', 'placeholder': 'Votre commentaire', 'rows': 4}}) }}
+            </div>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        {{ form_end(commentForm) }}
+    </div>
+</div>
 {% endblock %}

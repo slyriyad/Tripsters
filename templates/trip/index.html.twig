@@ -2,48 +2,54 @@
 
 {% block title %}Trip index{% endblock %}
 
-{% block body %}
-    <h1>Trip index</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>StartDate</th>
-                <th>EndDate</th>
-                <th>Destination</th>
-                <th>Budget</th>
-                <th>CreationDate</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for trip in trips %}
-            <tr>
-                <td>{{ trip.id }}</td>
-                <td>{{ trip.name }}</td>
-                <td>{{ trip.description }}</td>
-                <td>{{ trip.startDate ? trip.startDate|date('Y-m-d') : '' }}</td>
-                <td>{{ trip.endDate ? trip.endDate|date('Y-m-d') : '' }}</td>
-                <td>{{ trip.destination }}</td>
-                <td>{{ trip.budget }}</td>
-                <td>{{ trip.creationDate ? trip.creationDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_trip_show', {'id': trip.id}) }}">show</a>
-                    <a href="{{ path('app_trip_edit', {'id': trip.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% if is_granted('ROLE_USER') %}
-        <a href="{{ path('app_trip_new') }}">Create new</a>
-    {% endif %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/indexTripStyles.css') }}">
 {% endblock %}
 
+{% block body %}
+<div class="trips-container">
+    <div class="trips-header">
+        <h1>Voyages</h1>
+        {% if is_granted('ROLE_USER') %}
+            <a href="{{ path('app_trip_new') }}" class="btn-create">Créer un nouveau voyage</a>
+        {% endif %}
+    </div>
+
+    <div class="trips-grid">
+        {% for trip in trips %}
+        <div class="trip-card">
+            {% if trip.imageName %}
+                <img class="trip-image" src="{{ asset('uploads/avatars/' ~ trip.imageName) }}" alt="Image of {{ trip.name }}">
+            {% else %}
+                <img class="trip-image" src="{{ asset('img/voyage.jpg') }}" >
+            {% endif %}
+            <div class="trip-content">
+                <h2>{{ trip.name }}</h2>
+                <p>{{ trip.description }}</p>
+                <div class="trip-details">
+                    <div class="detail">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>{{ trip.startDate|date('d-m-Y') }} - {{ trip.endDate|date('d-m-Y') }}</span>
+                    </div>
+                    <div class="detail">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ trip.destination }}</span>
+                    </div>
+                    <div class="detail">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>{{ trip.budget }}</span>
+                    </div>
+                </div>
+                <div class="trip-actions">
+                    <a href="{{ path('app_trip_show', {'id': trip.id}) }}" class="btn-show">Voir</a>
+                    <a href="{{ path('app_trip_edit', {'id': trip.id}) }}" class="btn-edit">Éditer</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p>Aucun voyage trouvé.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

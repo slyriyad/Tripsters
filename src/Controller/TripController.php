@@ -101,17 +101,24 @@ class TripController extends AbstractController
         $totalCostActivity += $tripActivity->getActivity()->getCost();
     }
 
+    $totalCostExpense = 0;
+    foreach ($trip->getExpenses() as $expense) {
+        $totalCostExpense += $expense->getAmount();
+    }
+    $totalCost = $totalCostActivity + $totalCostExpense;
+
     $categories = $categoryRepository->findAll();
 
         return $this->render('trip/show.html.twig', [
         'trip' => $trip,
         'activities' => $activities,
         'days' => $days,
-        'totalCostActivity' => $totalCostActivity,
+        'totalCost' => $totalCost,
         'activities' => $activities,
         'categories' => $categories,
     ]);
-        
+       
+    
     }
 
     #[Route('/{id}/edit', name: 'app_trip_edit', methods: ['GET', 'POST'])]

@@ -2,10 +2,17 @@
 
 {% block title %}New Trip{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/formTrip.css') }}">
+{% endblock %}
+
 {% block body %}
-    <h1>Create new Trip</h1>
+<h1>Create new Trip</h1>
+<div class="wrapper">
 
     {{ include('trip/_form.html.twig') }}
 
     <a href="{{ path('app_trip_index') }}">back to list</a>
+</div>
 {% endblock %}
