@@ -27,6 +27,9 @@ class CategoryActivity
     #[ORM\Column(length: 255)]
     private ?string $backgroundColor = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $icon = null;
+
 
     public function __construct()
     {
@@ -88,6 +91,18 @@ class CategoryActivity
     public function setBackgroundColor(string $backgroundColor): static
     {
         $this->backgroundColor = $backgroundColor;
+
+        return $this;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): static
+    {
+        $this->icon = $icon;
 
         return $this;
     }

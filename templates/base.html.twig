@@ -4,6 +4,8 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
         <meta charset="UTF-8">
         {% block javascripts %}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.js"></script>
         <script
             src="https://code.jquery.com/jquery-3.7.1.js"
             integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
@@ -36,12 +38,20 @@
             </nav>
             <div class="user">
                 {% if app.user %}
-                    <img src="{{ asset('uploads/avatars/' ~ app.user.imageName) }}" alt="Profile Picture">
-                    <span>{{ app.user.email }}</span>
-                    <a href="{{ path('app_logout') }}">Logout</a>
+                    <div class="user-info">
+                        {% if app.user.imageName %}
+                            <img src="{{ asset('uploads/avatars/' ~ app.user.imageName) }}" alt="Profile Picture" class="user-avatar">
+                        {% else %}
+                            <div class="user-avatar default-avatar">
+                                {{ app.user.email|first|upper }}
+                            </div>
+                        {% endif %}
+                        <span class="user-email">{{ app.user.email }}</span>
+                    </div>
+                    <a href="{{ path('app_logout') }}" class="user-action">Logout</a>
                 {% else %}
-                    <a href="{{ path('app_login') }}">Login</a>
-                    <a href="{{ path('app_register') }}">Register</a>
+                    <a href="{{ path('app_login') }}" class="user-action">Login</a>
+                    <a href="{{ path('app_register') }}" class="user-action">Register</a>
                 {% endif %}
             </div>
         </header>
