@@ -1,61 +1,78 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-        <meta charset="UTF-8">
-        {% block javascripts %}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.js"></script>
-        <script
-            src="https://code.jquery.com/jquery-3.7.1.js"
-            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
-            crossorigin="anonymous">
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-        {% endblock %}
-        <title>{% block title %}Tripsters{% endblock %}</title>
-        {% block stylesheets %}
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-        {% endblock %}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    </head>
-    <body>
-        <header>
-            <div class="logo">
-                <a href="{{ path('app_trip_index') }}">
-                    <img src="{{ asset('img/logo_tripsters.png') }}" alt="Tripsters logo">
-                </a>
-            </div>
-            <nav class="navbar">
-                <ul class="navbar-menu">
-                    {% if is_granted('ROLE_USER') %}
-                        <li><a href="{{ path('app_trip_index') }}"><i class="fa-solid fa-house"></i></a></li>
-                        <li><a href="{{ path('app_trip_index') }}"><i class="fa-regular fa-calendar"></i></a></li>
-                        {% block extra_nav %}{% endblock %}
-                    {% endif %}
-                </ul>
-            </nav>
-            <div class="user">
-                {% if app.user %}
-                    <div class="user-info">
-                        {% if app.user.imageName %}
-                            <img src="{{ asset('uploads/avatars/' ~ app.user.imageName) }}" alt="Profile Picture" class="user-avatar">
-                        {% else %}
-                            <div class="user-avatar default-avatar">
-                                {{ app.user.email|first|upper }}
-                            </div>
-                        {% endif %}
-                        <span class="user-email">{{ app.user.email }}</span>
-                    </div>
-                    <a href="{{ path('app_logout') }}" class="user-action">Logout</a>
-                {% else %}
-                    <a href="{{ path('app_login') }}" class="user-action">Login</a>
-                    <a href="{{ path('app_register') }}" class="user-action">Register</a>
-                {% endif %}
-            </div>
-        </header>
-        {% block body %}{% endblock %}
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tripsters{% endblock %}</title>
+    
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.css">
 
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="{{ path('app_trip_index') }}">
+                <img src="{{ asset('img/logo_tripsters.png') }}" alt="Tripsters logo">
+            </a>
+        </div>
+        <nav class="navbar">
+            <ul class="navbar-menu">
+                {% if is_granted('ROLE_USER') %}
+                    <li>
+                        <a href="{{ path('app_trip_index') }}">
+                            <i class="fa-solid fa-house icon"></i>
+                            <p class="text">Home</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('app_trip_index') }}">
+                            <i class="fa-regular fa-calendar icon"></i>
+                            <p class="text">Trip</p>
+                        </a>
+                    </li>
+                    {% block extra_nav %}{% endblock %}
+                {% endif %}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li class="admin">
+                        <a href="{{ path('admin') }}">
+                            <i class="fa-solid fa-screwdriver-wrench icon"></i>
+                            <p class="adminText">Admin</p>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        <div class="user">
+            {% if app.user %}
+                <div class="user-info">
+                    {% if app.user.imageName %}
+                        <img src="{{ asset('uploads/avatars/' ~ app.user.imageName) }}" alt="Profile Picture" class="user-avatar">
+                    {% else %}
+                        <div class="user-avatar default-avatar">
+                            {{ app.user.email|first|upper }}
+                        </div>
+                    {% endif %}
+                    <span class="user-email">{{ app.user.email }}</span>
+                </div>
+                <a href="{{ path('app_logout') }}" class="user-action">Logout</a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="user-action">Login</a>
+                <a href="{{ path('app_register') }}" class="user-action">Register</a>
+            {% endif %}
+        </div>
+    </header>
+    {% block body %}{% endblock %}
+
+    <!-- JS Links -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.js"></script>
+    {% block javascripts %}{% endblock %}
+</body>
 </html>

@@ -1,12 +1,12 @@
-*{
-    font-family: "poppins";
+* {
+    font-family: "Poppins", sans-serif;
 }
 
-#cards{
+#cards {
     height: 10vh;
     background-color: #007EA7;
     padding: 2% 10%;
-    margin: 2% 0%;
+    margin: 2% 0;
 }
 
 header {
@@ -56,29 +56,80 @@ header {
     background-color: #007EA7;
     padding: 10px;
     border-radius: 50%;
-    border: #007EA7 2px solid;
-    transition: 0.5s;
+    border: 2px solid #007EA7;
+    position: relative; /* Ensure positioning context for the pseudo-element */
+    overflow: hidden; /* Ensure content does not overflow */
 }
-
-.navbar-menu li:hover {
-    background-color: #ffffff;
-
-}
-
-.navbar-menu li:hover > a {
-    color: #007EA7;
-  }
 
 .navbar-menu a {
     text-decoration: none;
     color: #ffffff;
     font-size: 20px;
-    transition: 0.5s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: color 0.5s;
 }
+
+.navbar-menu li:hover {
+    background-color: #ffffff;
+}
+
+.navbar-menu li:hover .icon {
+    opacity: 0; /* Hide the icon on hover */
+}
+
+.navbar-menu li:hover .text,
+.navbar-menu li:hover .adminText {
+    opacity: 1; /* Show the text on hover */
+    visibility: visible; /* Ensure the text is visible */
+}
+
+.navbar-menu .icon, 
+.navbar-menu .text, 
+.navbar-menu .adminText {
+    position: absolute;
+    transition: opacity 0.3s, visibility 0.3s; /* Smooth transition */
+}
+
+.navbar-menu .text {
+    color: #007EA7;
+}
+
+.navbar-menu .adminText {
+    color: #a70000;
+}
+
+.navbar-menu .text, 
+.navbar-menu .adminText {
+    opacity: 0; /* Initially hide the text */
+    visibility: hidden; /* Initially hide the text */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+}
+
+.navbar-menu .icon {
+    font-size: 20px; /* Adjust icon size */
+}
+
+
+
+.admin {
+    background-color: #a70000!important;
+    border: 2px solid #a70000!important;
+}
+
+.admin:hover {
+    background-color: #ffffff!important;
+}
+
 
 .user {
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 
 .user img {
@@ -91,7 +142,6 @@ header {
 .user span {
     font-size: 16px;
     color: #333;
-    margin-right: 10px;
 }
 
 .user a {
@@ -101,25 +151,18 @@ header {
     font-size: 16px;
 }
 
-
-
-.user {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.user-action {
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: background-color 0.3s;
 }
 
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: 50%;
+.user-action:hover {
+    background-color: #e0e0e0;
 }
 
 .default-avatar {
@@ -133,21 +176,4 @@ header {
     font-weight: bold;
     font-size: 18px;
     border-radius: 50%;
-}
-
-.user-email {
-    font-size: 14px;
-}
-
-.user-action {
-    padding: 5px 10px;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-}
-
-.user-action:hover {
-    background-color: #e0e0e0;
 }
