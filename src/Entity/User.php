@@ -52,10 +52,28 @@ private Collection $activities;
 #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'author')]
 private Collection $comments;
 
+#[ORM\Column(length: 25)]
+private ?string $name = null;
+
+/**
+ * @var Collection<int, TripInvitation>
+ */
+#[ORM\OneToMany(targetEntity: TripInvitation::class, mappedBy: 'invitee')]
+private Collection $receivedInvitations;
+
+/**
+ * @var Collection<int, TripInvitation>
+ */
+#[ORM\OneToMany(targetEntity: TripInvitation::class, mappedBy: 'creator')]
+private Collection $sentInvitations;
+
 public function __construct()
 {
     $this->activities = new ArrayCollection();
     $this->comments = new ArrayCollection();
+    $this->receivedInvitations = new ArrayCollection();
+    $this->sentInvitations = new ArrayCollection();
+    $this->roles[] = 'ROLE_USER';
 }
 
 public function getId(): ?int
@@ -80,11 +98,15 @@ public function getUserIdentifier(): string
 }
 
 public function getRoles(): array
-{
-    $roles = $this->roles;
-    $roles[] = 'ROLE_USER';
-    return array_unique($roles);
-}
+    {
+        $roles = $this->roles;
+        // Chaque utilisateur a au moins ROLE_USER
+        if (!in_array('ROLE_USER', $roles)) {
+            $roles[] = 'ROLE_USER';
+        }
+
+        return array_unique($roles);
+    }
 
 public function setRoles(array $roles): self
 {
@@ -247,6 +269,78 @@ public function serialize()
             // set the owning side to null (unless already changed)
             if ($comment->getAuthor() === $this) {
                 $comment->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TripInvitation>
+     */
+    public function getReceivedInvitations(): Collection
+    {
+        return $this->receivedInvitations;
+    }
+
+    public function addReceivedInvitation(TripInvitation $receivedInvitation): static
+    {
+        if (!$this->receivedInvitations->contains($receivedInvitation)) {
+            $this->receivedInvitations->add($receivedInvitation);
+            $receivedInvitation->setInvitee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReceivedInvitation(TripInvitation $receivedInvitation): static
+    {
+        if ($this->receivedInvitations->removeElement($receivedInvitation)) {
+            // set the owning side to null (unless already changed)
+            if ($receivedInvitation->getInvitee() === $this) {
+                $receivedInvitation->setInvitee(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TripInvitation>
+     */
+    public function getSentInvitations(): Collection
+    {
+        return $this->sentInvitations;
+    }
+
+    public function addSentInvitation(TripInvitation $sentInvitation): static
+    {
+        if (!$this->sentInvitations->contains($sentInvitation)) {
+            $this->sentInvitations->add($sentInvitation);
+            $sentInvitation->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSentInvitation(TripInvitation $sentInvitation): static
+    {
+        if ($this->sentInvitations->removeElement($sentInvitation)) {
+            // set the owning side to null (unless already changed)
+            if ($sentInvitation->getCreator() === $this) {
+                $sentInvitation->setCreator(null);
             }
         }
 

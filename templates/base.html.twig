@@ -36,6 +36,12 @@
                             <p class="text">Trip</p>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ path('dashboard') }}">
+                            <i class="fa-solid fa-envelope"></i>
+                            <p class="text">invitation</p>
+                        </a>
+                    </li>
                     {% block extra_nav %}{% endblock %}
                 {% endif %}
                 {% if is_granted('ROLE_ADMIN') %}

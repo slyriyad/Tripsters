@@ -20,6 +20,15 @@ class TripUser
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\Column(length: 25)]
+    private ?string $role = null;
+
+    public function __construct()
+    {
+        // Rôle par défaut
+        $this->role = 'participant';
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -45,6 +54,18 @@ class TripUser
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): static
+    {
+        $this->role = $role;
 
         return $this;
     }

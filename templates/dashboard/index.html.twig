@@ -1,11 +1,50 @@
 {% extends 'base.html.twig' %}
 
-
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+{% endblock %}
 {% block title %}Hello DashboardController!{% endblock %}
 
 {% block body %}
 
-<div class="wrapper">
-    <h1>Hello</h1>
-</div>
+{% for message in app.flashes('success') %}
+    <div class="flash-message">
+        {{ message }}
+    </div>
+{% endfor %}
+
+{% for message in app.flashes('error') %}
+    <div class="flash-message">
+        {{ message }}
+    </div>
+{% endfor %}
+
+<h2>Invitations en attente</h2>
+<ul>
+    {% for invitation in invitations %}
+        <li>
+            Vous avez été invité à rejoindre le voyage "{{ invitation.trip.name }}".
+            <form action="{{ path('trip_invitation_accept', { 'id': invitation.id }) }}" method="post" style="display:inline;">
+                <button type="submit">Accepter</button>
+            </form>
+            <form action="{{ path('trip_invitation_decline', { 'id': invitation.id }) }}" method="post" style="display:inline;">
+                <button type="submit">Refuser</button>
+            </form>
+        </li>
+    {% endfor %}
+</ul>
+
+<script>
+    // Faire disparaître automatiquement les messages flash après 3 secondes (3000 ms)
+    setTimeout(function() {
+        let flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(message) {
+            message.style.transition = 'opacity 1s';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 1000); // Supprimer l'élément après 1 seconde
+        });
+    }, 3000); // Attendre 3 secondes avant de démarrer l'animation
+</script>
 {% endblock %}

@@ -22,6 +22,7 @@
             <h1>{{ trip.name }}</h1>
             <p>Du {{ trip.startDate ? trip.startDate|date('d-m-Y') : '' }} au {{ trip.endDate ? trip.endDate|date('d-m-Y') : '' }}</p>
             <a href="{{ path('app_trip_edit', {'id': trip.id}) }}">Modifier</a>
+            <a href="{{ path('trip_invite', {'id': trip.id}) }}">Inviter un tripster !</a>
         </div>
     </div>
 {# Dans templates/activity/index.html.twig
