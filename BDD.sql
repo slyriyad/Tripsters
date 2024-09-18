@@ -230,3 +230,261 @@ INSERT INTO `user` (`id`, `email`, `roles`, `password`, `image_name`, `image_siz
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- --------------------------------------------------------
+-- Hôte:                         127.0.0.1
+-- Version du serveur:           8.0.30 - MySQL Community Server - GPL
+-- SE du serveur:                Win64
+-- HeidiSQL Version:             12.1.0.6537
+-- --------------------------------------------------------
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+-- Listage de la structure de la base pour tripsters
+CREATE DATABASE IF NOT EXISTS `tripsters` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `tripsters`;
+
+-- Listage de la structure de table tripsters. activity
+CREATE TABLE IF NOT EXISTS `activity` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `category_activity_id` int DEFAULT NULL,
+  `created_by_id` int DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` longtext COLLATE utf8mb4_unicode_ci,
+  `cost` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_AC74095A365B22FD` (`category_activity_id`),
+  KEY `IDX_AC74095AB03A8386` (`created_by_id`),
+  CONSTRAINT `FK_AC74095A365B22FD` FOREIGN KEY (`category_activity_id`) REFERENCES `category_activity` (`id`),
+  CONSTRAINT `FK_AC74095AB03A8386` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.activity : ~0 rows (environ)
+
+-- Listage de la structure de table tripsters. category_activity
+CREATE TABLE IF NOT EXISTS `category_activity` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(55) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `background_color` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `icon` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.category_activity : ~0 rows (environ)
+
+-- Listage de la structure de table tripsters. category_expense
+CREATE TABLE IF NOT EXISTS `category_expense` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(55) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `icon` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `background_color` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.category_expense : ~0 rows (environ)
+
+-- Listage de la structure de table tripsters. comment
+CREATE TABLE IF NOT EXISTS `comment` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `author_id` int NOT NULL,
+  `activity_id` int DEFAULT NULL,
+  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_9474526CF675F31B` (`author_id`),
+  KEY `IDX_9474526C81C06096` (`activity_id`),
+  CONSTRAINT `FK_9474526C81C06096` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`id`),
+  CONSTRAINT `FK_9474526CF675F31B` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.comment : ~0 rows (environ)
+
+-- Listage de la structure de table tripsters. doctrine_migration_versions
+CREATE TABLE IF NOT EXISTS `doctrine_migration_versions` (
+  `version` varchar(191) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `executed_at` datetime DEFAULT NULL,
+  `execution_time` int DEFAULT NULL,
+  PRIMARY KEY (`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+
+-- Listage des données de la table tripsters.doctrine_migration_versions : ~1 rows (environ)
+INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
+	('DoctrineMigrations\\Version20240917230659', '2024-09-17 23:07:13', 537),
+	('DoctrineMigrations\\Version20240917235215', '2024-09-17 23:52:29', 157);
+
+-- Listage de la structure de table tripsters. expense
+CREATE TABLE IF NOT EXISTS `expense` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `trip_id` int DEFAULT NULL,
+  `category_expense_id` int DEFAULT NULL,
+  `amount` int NOT NULL,
+  `description` longtext COLLATE utf8mb4_unicode_ci,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `date` date NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_2D3A8DA6A5BC2E0E` (`trip_id`),
+  KEY `IDX_2D3A8DA6D58B8B05` (`category_expense_id`),
+  CONSTRAINT `FK_2D3A8DA6A5BC2E0E` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`id`),
+  CONSTRAINT `FK_2D3A8DA6D58B8B05` FOREIGN KEY (`category_expense_id`) REFERENCES `category_expense` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.expense : ~0 rows (environ)
+
+-- Listage de la structure de table tripsters. messenger_messages
+CREATE TABLE IF NOT EXISTS `messenger_messages` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `body` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `headers` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue_name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `available_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `delivered_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
+  PRIMARY KEY (`id`),
+  KEY `IDX_75EA56E0FB7336F0` (`queue_name`),
+  KEY `IDX_75EA56E0E3BD61CE` (`available_at`),
+  KEY `IDX_75EA56E016BA31DB` (`delivered_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.messenger_messages : ~0 rows (environ)
+
+-- Listage de la structure de table tripsters. trip
+CREATE TABLE IF NOT EXISTS `trip` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` longtext COLLATE utf8mb4_unicode_ci,
+  `start_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  `destination` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `budget` int DEFAULT NULL,
+  `image_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image_size` int DEFAULT NULL,
+  `creation_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.trip : ~0 rows (environ)
+INSERT INTO `trip` (`id`, `name`, `description`, `start_date`, `end_date`, `destination`, `budget`, `image_name`, `image_size`, `creation_date`) VALUES
+	(9, 'nuit de noce', 'test', '2024-09-18 02:37:00', '2024-09-29 02:37:00', 'Japon', 3000, '66ea234144888429981490.jpg', 135555, NULL),
+	(10, 'ete 2019', 'test', '2024-09-18 05:28:00', '2024-09-29 05:28:00', 'maroc', 2000, '66ea48d50868f218926881.png', 4577, NULL);
+
+-- Listage de la structure de table tripsters. trip_activity
+CREATE TABLE IF NOT EXISTS `trip_activity` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `trip_id` int DEFAULT NULL,
+  `activity_id` int DEFAULT NULL,
+  `start_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_4253A4AA5BC2E0E` (`trip_id`),
+  KEY `IDX_4253A4A81C06096` (`activity_id`),
+  CONSTRAINT `FK_4253A4A81C06096` FOREIGN KEY (`activity_id`) REFERENCES `activity` (`id`),
+  CONSTRAINT `FK_4253A4AA5BC2E0E` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.trip_activity : ~0 rows (environ)
+
+-- Listage de la structure de table tripsters. trip_invitation
+CREATE TABLE IF NOT EXISTS `trip_invitation` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `trip_id` int NOT NULL,
+  `invitee_id` int NOT NULL,
+  `creator_id` int NOT NULL,
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sent_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  PRIMARY KEY (`id`),
+  KEY `IDX_40FBAB4A5BC2E0E` (`trip_id`),
+  KEY `IDX_40FBAB47A512022` (`invitee_id`),
+  KEY `IDX_40FBAB461220EA6` (`creator_id`),
+  CONSTRAINT `FK_40FBAB461220EA6` FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FK_40FBAB47A512022` FOREIGN KEY (`invitee_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FK_40FBAB4A5BC2E0E` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.trip_invitation : ~1 rows (environ)
+INSERT INTO `trip_invitation` (`id`, `trip_id`, `invitee_id`, `creator_id`, `status`, `sent_at`) VALUES
+	(5, 10, 1, 2, 'accepted', '2024-09-18 03:28:30');
+
+-- Listage de la structure de table tripsters. trip_user
+CREATE TABLE IF NOT EXISTS `trip_user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `trip_id` int DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `role` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'participant',
+  PRIMARY KEY (`id`),
+  KEY `IDX_A6AB4522A5BC2E0E` (`trip_id`),
+  KEY `IDX_A6AB4522A76ED395` (`user_id`),
+  CONSTRAINT `FK_A6AB4522A5BC2E0E` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`id`),
+  CONSTRAINT `FK_A6AB4522A76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.trip_user : ~3 rows (environ)
+INSERT INTO `trip_user` (`id`, `trip_id`, `user_id`, `role`) VALUES
+	(1, 9, 1, 'participant'),
+	(2, 10, 2, 'participant'),
+	(3, 10, 1, 'participant');
+
+-- Listage de la structure de table tripsters. user
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `roles` json NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image_size` int DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `name` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQ_8D93D649E7927C74` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage des données de la table tripsters.user : ~0 rows (environ)
+INSERT INTO `user` (`id`, `email`, `roles`, `password`, `image_name`, `image_size`, `updated_at`, `name`) VALUES
+	(1, 'test@test.fr', '["ROLE_USER"]', '$2y$13$s3ggyrWw/V/F7n58nLhOxe1gWaIyv3Mi6UuKvR3sj4tsmuoimclku', '66ea20be3082e081428615.jpg', 135555, '2024-09-18 00:37:18', 'test'),
+	(2, 'Riyad25400@gmail.com', '["ROLE_USER"]', '$2y$13$/7c6xDBWLLOEYpjtkmxpe.kZhpCCILm7iqrORDjuv3uDBUYhQgrGa', '66ea2480e9e96051599500.jpg', 135555, '2024-09-18 00:53:20', 'test25');
+
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;

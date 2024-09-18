@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ topic.title }}</h1>
+<p>Par {{ topic.author.email }} le {{ topic.createdAt|date('d-m-Y H:i') }}</p>
+<p>{{ topic.content }}</p>
+
+<h2>Réponses</h2>
+<ul>
+    {% for reply in replies %}
+        <li>
+            <p>{{ reply.content }}</p>
+            <p>Par {{ reply.author.email }} le {{ reply.createdAt|date('d-m-Y H:i') }}</p>
+        </li>
+    {% else %}
+        <li>Aucune réponse pour l'instant.</li>
+    {% endfor %}
+</ul>
+
+<h3>Ajouter une réponse</h3>
+{{ form_start(form) }}
+{{ form_widget(form) }}
+<button type="submit">Répondre</button>
+{{ form_end(form) }}
+{% endblock %}

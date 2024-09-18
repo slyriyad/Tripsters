@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un nouveau sujet{% endblock %}
+
+{% block body %}
+    <h1>Créer un nouveau sujet</h1>
+
+    {{ form_start(form) }}
+        <div class="form-group">
+            <label for="title">Titre du sujet</label>
+            {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="form-group">
+            <label for="content">Contenu</label>
+            {{ form_widget(form.content, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Créer le sujet</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('forum_index') }}" class="btn btn-secondary mt-3">Retour à la liste des sujets</a>
+{% endblock %}

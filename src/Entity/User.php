@@ -67,6 +67,18 @@ private Collection $receivedInvitations;
 #[ORM\OneToMany(targetEntity: TripInvitation::class, mappedBy: 'creator')]
 private Collection $sentInvitations;
 
+/**
+ * @var Collection<int, ForumTopic>
+ */
+#[ORM\OneToMany(targetEntity: ForumTopic::class, mappedBy: 'author')]
+private Collection $forumTopics;
+
+/**
+ * @var Collection<int, ForumReply>
+ */
+#[ORM\OneToMany(targetEntity: ForumReply::class, mappedBy: 'author')]
+private Collection $forumReplies;
+
 public function __construct()
 {
     $this->activities = new ArrayCollection();
@@ -74,6 +86,8 @@ public function __construct()
     $this->receivedInvitations = new ArrayCollection();
     $this->sentInvitations = new ArrayCollection();
     $this->roles[] = 'ROLE_USER';
+    $this->forumTopics = new ArrayCollection();
+    $this->forumReplies = new ArrayCollection();
 }
 
 public function getId(): ?int
@@ -341,6 +355,66 @@ public function serialize()
             // set the owning side to null (unless already changed)
             if ($sentInvitation->getCreator() === $this) {
                 $sentInvitation->setCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ForumTopic>
+     */
+    public function getForumTopics(): Collection
+    {
+        return $this->forumTopics;
+    }
+
+    public function addForumTopic(ForumTopic $forumTopic): static
+    {
+        if (!$this->forumTopics->contains($forumTopic)) {
+            $this->forumTopics->add($forumTopic);
+            $forumTopic->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeForumTopic(ForumTopic $forumTopic): static
+    {
+        if ($this->forumTopics->removeElement($forumTopic)) {
+            // set the owning side to null (unless already changed)
+            if ($forumTopic->getAuthor() === $this) {
+                $forumTopic->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ForumReply>
+     */
+    public function getForumReplies(): Collection
+    {
+        return $this->forumReplies;
+    }
+
+    public function addForumReply(ForumReply $forumReply): static
+    {
+        if (!$this->forumReplies->contains($forumReply)) {
+            $this->forumReplies->add($forumReply);
+            $forumReply->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeForumReply(ForumReply $forumReply): static
+    {
+        if ($this->forumReplies->removeElement($forumReply)) {
+            // set the owning side to null (unless already changed)
+            if ($forumReply->getAuthor() === $this) {
+                $forumReply->setAuthor(null);
             }
         }
 
