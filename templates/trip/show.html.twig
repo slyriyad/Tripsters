@@ -27,7 +27,7 @@
     </div>
 
     <div class="cards">
-        <div class="card" id="budgetCard">
+        <div class="card" id="budgetCard" style="background-color:#007da79a; border:none">
             <h2>Budget</h2>
             <p>{{ trip.budget }} €</p>  
             <h2>Dépense</h2>
@@ -45,7 +45,7 @@
         </svg>
     </div>
 </div>
-<button class="add-activity">Ajouter une activité</button>
+<button class="add-activity btn btn-primary" data-bs-toggle="modal" data-bs-target="#activityModal">Ajouter une activité</button>
 <div class="calendar">
     <div class="swiper mySwiper" style="min-height:500px">
         <div class="swiper-wrapper" style="min-height:500px">
@@ -96,26 +96,51 @@
         <div class="swiper-button-prev"></div>
     </div>
     
-    <div id="activityModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Ajouter une activité</h2>
-            <form id="addActivityForm">
-                <input type="text" id="activityName" placeholder="Nom de l'activité" required>
-                <textarea id="activityDescription" placeholder="Description"></textarea>
-                <input type="number" id="activityCost" placeholder="Coût">
-                <input type="datetime-local" id="activityStartDate" required>
-                <input type="datetime-local" id="activityEndDate" required>
-                <select id="activityCategory" required>
-                    <option value="">Choisir une catégorie</option>
-                    {% for category in categories %}
-                        <option value="{{ category.id }}" data-color="{{ category.backgroundColor }}">{{ category.nom }}</option>
-                    {% endfor %}
-                </select><br>
-                <button type="submit">Ajouter</button>
-            </form>
+    <div class="modal fade" id="activityModal" tabindex="-1" aria-labelledby="activityModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="activityModalLabel">Ajouter une activité</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addActivityForm">
+                        <div class="mb-3">
+                            <label for="activityName" class="form-label">Nom de l'activité</label>
+                            <input type="text" class="form-control" id="activityName" placeholder="Nom de l'activité" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="activityDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="activityDescription" placeholder="Description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="activityCost" class="form-label">Coût</label>
+                            <input type="number" class="form-control" id="activityCost" placeholder="Coût" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="activityStartDate" class="form-label">Date de début</label>
+                            <input type="datetime-local" class="form-control" id="activityStartDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="activityEndDate" class="form-label">Date de fin</label>
+                            <input type="datetime-local" class="form-control" id="activityEndDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="activityCategory" class="form-label">Catégorie</label>
+                            <select class="form-select" id="activityCategory" required>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" data-color="{{ category.backgroundColor }}">{{ category.nom }}</option>
+                                {% endfor %}
+                                <!-- Vos catégories ici -->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+    
     {% if trip.tripActivities|length > 4 %}
     <div class="see-more">Voir plus ({{ trip.tripActivities|length - 4 }} autres)</div>
     {% endif %}
@@ -131,6 +156,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Initialisation du swiper
             var swiper = new Swiper(".mySwiper", {
                 slidesPerView: 4,
                 spaceBetween: 30,
@@ -144,7 +170,7 @@
                 },
                 mousewheel: false,
                 keyboard: true,
-                breakpoints:{
+                breakpoints: {
                     0: {
                         slidesPerView: 1,
                     },
@@ -160,25 +186,16 @@
                 },
             });
 
+            // Mise à jour du total des dépenses
             let totalCost = {{ totalCost }};
             $('#totalExpense').text(totalCost + ' €');
 
-            $('.add-activity').on('click', function() {
-                $('#activityModal').show();
-                const defaultDate = new Date('{{ trip.startDate|date('Y-m-d') }}');
-                const formattedDate = defaultDate.toISOString().split('T')[0];
-                $('#activityStartDate').val(formattedDate + 'T09:00');
-                $('#activityEndDate').val(formattedDate + 'T10:00');
-            });
-
-            
-            $('.close').on('click', function() {
-                $('#activityModal').hide();
-            });
-
+            // Soumission du formulaire d'ajout d'activité
             $('#addActivityForm').on('submit', function(e) {
                 e.preventDefault();
                 const tripId = {{ trip.id }};
+                
+                // Récupération des données du formulaire
                 const data = {
                     name: $('#activityName').val(),
                     description: $('#activityDescription').val(),
@@ -187,78 +204,39 @@
                     endDate: $('#activityEndDate').val(),
                     categoryId: $('#activityCategory').val()
                 };
-
-                console.log('Submitting form with data:', data);
-
+        
+                // Envoi des données via AJAX
                 $.ajax({
                     url: '/trip/' + tripId + '/add-activity',
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
                     success: function(response) {
-                        console.log('Server response:', response);
-                        try {
-                            if (response && response.startDate && response.endDate && response.name && response.description && response.cost !== undefined) {
-                                const startTime = response.startDate.split('T')[1].substring(0, 5);
-                                const endTime = response.endDate.split('T')[1].substring(0, 5);
-
-                                const activityDate = new Date(response.startDate);
-                                const formattedDate = activityDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
-
-                                const dayColumn = $('.day').filter(function() {
-                                    return $(this).find('.date-day').text().trim() === formattedDate;
-                                });
-
-                                if (dayColumn.length > 0) {
-                                    const categoryColor = response.categoryColor || '#default-color';
-                                    const newActivity = `
-                                        <div class="event" style="background-color: ${categoryColor}">
-                                            <div class="event-left">
-                                                <p>${startTime}H</p>
-                                                <p>${endTime}H</p>
-                                            </div>
-                                            <div class="event-right">
-                                                <p>${response.name}</p>
-                                                <p>${response.description}</p>
-                                                <p>Coût: ${response.cost} €</p>
-                                                <p>Catégorie: ${response.categoryName || 'Non catégorisé'}</p>
-                                            </div>
-                                        </div>
-                                    `;
-
-                                    dayColumn.find('.events').append(newActivity);
-                                    totalCost += parseFloat(response.cost);
-                                    $('#totalExpense').text(totalCost.toFixed(2) + ' €');
-                                    swiper.update();
-                                    swiper.updateSlides();
-                                    swiper.updateProgress();
-                                    swiper.updateSlidesClasses();
-                                    $('#activityModal').hide();
-                                    $('#addActivityForm')[0].reset();
-                                } else {
-                                    console.error('Colonne du jour non trouvée pour la date:', formattedDate);
-                                    alert('Impossible d\'ajouter l\'activité. La date est en dehors de la période du voyage.');
-                                }
-                            } else {
-                                throw new Error('Réponse du serveur invalide ou incomplète');
-                            }
-                        } catch (error) {
-                            console.error('Erreur dans le callback de succès:', error);
-                            alert('Une erreur est survenue lors de l\'ajout de l\'activité. Veuillez réessayer.');
+                        console.log('Réponse du serveur:', response);
+                        
+                        if (response && response.startDate && response.endDate && response.name && response.cost !== undefined) {
+                            // Traitement des données reçues et mise à jour de l'interface utilisateur
+                            // (Ajout de l'activité dans la vue, mise à jour des coûts, etc.)
                             
+                            // Fermer la modale avec Bootstrap 5
+                            var modal = bootstrap.Modal.getInstance(document.getElementById('activityModal'));
+                            modal.hide();
+                            
+                            // Réinitialiser le formulaire après la fermeture de la modale
+                            $('#addActivityForm')[0].reset();
+                            location.reload();
+                        } else {
+                            console.error('Données manquantes ou incorrectes dans la réponse:', response);
+                            alert('Erreur dans les données de la réponse.');
                         }
                     },
                     error: function(xhr, status, error) {
                         console.error('Erreur AJAX:', status, error);
-                        console.error('Réponse du serveur:', xhr.responseText);
-                        alert('Une erreur est survenue : ' + xhr.responseText);
-                        $('#activityModal').hide();
-                        $('#addActivityForm')[0].reset();
+                        alert('Une erreur est survenue lors de l\'ajout de l\'activité : ' + xhr.responseText);
                     }
-                }).always(function() {
-
                 });
             });
         });
     </script>
 {% endblock %}
+

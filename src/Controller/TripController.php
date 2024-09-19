@@ -164,69 +164,70 @@ class TripController extends AbstractController
     }
 
     #[Route('/{tripId}/add-activity', name: 'trip_add_activity', methods: ['POST'])]
-    public function addActivity(Request $request, int $tripId, TripRepository $tripRepository, CategoryActivityRepository $categoryRepository, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $trip = $tripRepository->find($tripId);
-        if (!$trip) {
-            return new JsonResponse(['error' => 'Voyage non trouvé'], 404);
-        }
-
-        $data = json_decode($request->getContent(), true);
-
-        // Vérifier les dates de l'activité
-        $startDate = new \DateTime($data['startDate']);
-        $endDate = new \DateTime($data['endDate']);
-        $tripStartDate = $trip->getStartDate();
-        $tripEndDate = $trip->getEndDate();
-
-        // Vérifier si l'activité est en dehors de la période du voyage
-        if ($startDate < $tripStartDate || $endDate > $tripEndDate) {
-            return new JsonResponse(['error' => 'Les dates de l\'activité doivent être comprises dans la période du voyage.'], 400);
-        }
-
-        $activity = new Activity();
-        $activity->setName($data['name']);
-        $activity->setDescription($data['description']);
-        $activity->setCost($data['cost']);
-        $activity->setCreatedBy($this->getUser());
-
-        if (isset($data['categoryId'])) {
-            $category = $categoryRepository->find($data['categoryId']);
-            if ($category) {
-                $activity->setCategoryActivity($category);
-            }
-        }
-
-        $tripActivity = new TripActivity();
-        $tripActivity->setTrip($trip);
-        $tripActivity->setActivity($activity);
-        $tripActivity->setStartDate($startDate);
-        $tripActivity->setEndDate($endDate);
-
-        $entityManager->persist($activity);
-        $entityManager->persist($tripActivity);
-        $entityManager->flush();
-
-        $createdBy = $activity->getCreatedBy();
-        $profilePicture = null;
-        if ($createdBy && $createdBy->getImageName()) {
-            $profilePicture = $this->getParameter('app.path.avatars') . '/' . $createdBy->getImageName();
-        }
-
-        return new JsonResponse([
-            'id' => $tripActivity->getId(),
-            'name' => $activity->getName(),
-            'description' => $activity->getDescription(),
-            'cost' => $activity->getCost(),
-            'startDate' => $tripActivity->getStartDate()->format('Y-m-d H:i:s'),
-            'endDate' => $tripActivity->getEndDate()->format('Y-m-d H:i:s'),
-            'createdBy' => [
-                'id' => $createdBy ? $createdBy->getId() : null,
-                'email' => $createdBy ? $createdBy->getEmail() : null,
-                'profilePicture' => $profilePicture,
-            ],
-        ]);
+public function addActivity(Request $request, int $tripId, TripRepository $tripRepository, CategoryActivityRepository $categoryRepository, EntityManagerInterface $entityManager): JsonResponse
+{
+    $trip = $tripRepository->find($tripId);
+    if (!$trip) {
+        return new JsonResponse(['error' => 'Voyage non trouvé'], 404);
     }
+
+    $data = json_decode($request->getContent(), true);
+
+    // Vérifier les dates de l'activité
+    $startDate = new \DateTime($data['startDate'], new \DateTimeZone('UTC'));
+    $endDate = new \DateTime($data['endDate'], new \DateTimeZone('UTC'));
+    $tripStartDate = $trip->getStartDate();
+    $tripEndDate = $trip->getEndDate();
+
+    // Vérifier si l'activité est en dehors de la période du voyage
+    if ($startDate <= $tripStartDate || $endDate >= $tripEndDate) {
+        return new JsonResponse(['error' => 'Les dates de l\'activité doivent être comprises dans la période du voyage.'], 400);
+    }
+
+    $activity = new Activity();
+    $activity->setName($data['name']);
+    $activity->setDescription($data['description']);
+    $activity->setCost($data['cost']);
+    $activity->setCreatedBy($this->getUser());
+
+    if (isset($data['categoryId'])) {
+        $category = $categoryRepository->find($data['categoryId']);
+        if ($category) {
+            $activity->setCategoryActivity($category);
+        }
+    }
+
+    $tripActivity = new TripActivity();
+    $tripActivity->setTrip($trip);
+    $tripActivity->setActivity($activity);
+    $tripActivity->setStartDate($startDate);
+    $tripActivity->setEndDate($endDate);
+
+    $entityManager->persist($activity);
+    $entityManager->persist($tripActivity);
+    $entityManager->flush();
+
+    $createdBy = $activity->getCreatedBy();
+
+
+    // Réponse JSON avec les données de l'activité
+    $response = [
+        'id' => $tripActivity->getId(),
+        'name' => $activity->getName(),
+        'description' => $activity->getDescription(),
+        'cost' => $activity->getCost(),
+        'startDate' => $tripActivity->getStartDate()->format('Y-m-d H:i:s'),
+        'endDate' => $tripActivity->getEndDate()->format('Y-m-d H:i:s'),
+        'createdBy' => [
+            'id' => $createdBy ? $createdBy->getId() : null,
+        ],
+    ];
+
+    // Log de la réponse pour débogage
+    error_log(json_encode($response));
+
+    return new JsonResponse($response);
+}
 
     #[Route('/{id}/balances', name: 'app_trip_balances', methods: ['GET'])]
     public function showBalances(Trip $trip, ExpenseRepository $expenseRepository): Response
