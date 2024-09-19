@@ -2,37 +2,49 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    {{ parent() }}
 {% endblock %}
-{% block title %}Hello DashboardController!{% endblock %}
+
+{% block title %}Invitations en attente{% endblock %}
 
 {% block body %}
+<div class="container mt-4">
 
-{% for message in app.flashes('success') %}
-    <div class="flash-message">
-        {{ message }}
-    </div>
-{% endfor %}
-
-{% for message in app.flashes('error') %}
-    <div class="flash-message">
-        {{ message }}
-    </div>
-{% endfor %}
-
-<h2>Invitations en attente</h2>
-<ul>
-    {% for invitation in invitations %}
-        <li>
-            Vous avez été invité à rejoindre le voyage "{{ invitation.trip.name }}".
-            <form action="{{ path('trip_invitation_accept', { 'id': invitation.id }) }}" method="post" style="display:inline;">
-                <button type="submit">Accepter</button>
-            </form>
-            <form action="{{ path('trip_invitation_decline', { 'id': invitation.id }) }}" method="post" style="display:inline;">
-                <button type="submit">Refuser</button>
-            </form>
-        </li>
+    <!-- Affichage des messages flash avec Bootstrap -->
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show flash-message" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     {% endfor %}
-</ul>
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show flash-message" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <h2>Invitations en attente</h2>
+    <ul class="list-group mb-4">
+        {% for invitation in invitations %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Vous avez été invité à rejoindre le voyage "{{ invitation.trip.name }}".</span>
+                <div>
+                    <form action="{{ path('trip_invitation_accept', { 'id': invitation.id }) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-success btn-sm">Accepter</button>
+                    </form>
+                    <form action="{{ path('trip_invitation_decline', { 'id': invitation.id }) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Refuser</button>
+                    </form>
+                </div>
+            </li>
+        {% else %}
+            <li class="list-group-item">Aucune invitation en attente.</li>
+        {% endfor %}
+    </ul>
+
+</div>
 
 <script>
     // Faire disparaître automatiquement les messages flash après 3 secondes (3000 ms)

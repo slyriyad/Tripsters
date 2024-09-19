@@ -1,15 +1,24 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<h1>Forum</h1>
-<a href="{{ path('forum_new') }}">Créer un nouveau sujet</a>
+<div class="container mt-4">
+    <h1 class="mb-4">Forum</h1>
+    <a href="{{ path('forum_new') }}" class="btn btn-primary mb-3">Créer un nouveau sujet</a>
 
-<ul>
-    {% for topic in topics %}
-        <li>
-            <a href="{{ path('forum_show', { 'id': topic.id }) }}">{{ topic.title }}</a>
-            par {{ topic.author.email }} le {{ topic.createdAt|date('d-m-Y H:i') }}
-        </li>
-    {% endfor %}
-</ul>
+    <div class="list-group">
+        {% for topic in pagination.items %}
+            <a href="{{ path('forum_show', { 'id': topic.id }) }}" class="list-group-item list-group-item-action">
+                <h5>{{ topic.title }}</h5>
+                <small>Par {{ topic.author.name }} le {{ topic.createdAt|date('d-m-Y H:i') }}</small>
+            </a>
+        {% else %}
+            <div class="alert alert-warning">Aucun sujet disponible pour le moment.</div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination avec Bootstrap -->
+    <nav aria-label="Page navigation" class="mt-4">
+        {{ knp_pagination_render(pagination) }}
+    </nav>
+</div>
 {% endblock %}

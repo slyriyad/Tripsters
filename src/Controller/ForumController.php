@@ -3,24 +3,36 @@ namespace App\Controller;
 
 use App\Entity\ForumTopic;
 use App\Form\ForumTopicType;
+use App\Repository\ForumTopicRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/forum')]
 class ForumController extends AbstractController
 {
-    #[Route('/', name: 'forum_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $em): Response
+    #[Route('/', name: 'forum_index')]
+    public function index(ForumTopicRepository $forumTopicRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $topics = $em->getRepository(ForumTopic::class)->findAll();
+        // Récupérer la requête pour les sujets du forum
+        $query = $forumTopicRepository->createQueryBuilder('t')->getQuery();
 
+        // Utilisation du paginator pour paginer les résultats
+        $pagination = $paginator->paginate(
+            $query, // La requête (ne pas exécuter avec getResult())
+            $request->query->getInt('page', 1), // Page actuelle
+            10 // Limite d'éléments par page
+        );
+
+        // Transmettre la variable pagination à la vue Twig
         return $this->render('forum/index.html.twig', [
-            'topics' => $topics,
+            'pagination' => $pagination, // Variable pagination transmise à la vue
         ]);
     }
+
 
     #[Route('/new', name: 'forum_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response

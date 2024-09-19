@@ -93,13 +93,24 @@ public function edit(Request $request, User $user, EntityManagerInterface $entit
 }
 
     #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
-    public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $em)
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($user);
-            $entityManager->flush();
+        // Récupérer l'utilisateur anonyme
+        $anonymousUser = $em->getRepository(User::class)->findOneBy(['email' => 'anonymous@forum.com']);
+        
+        // Réassigner les posts de l'utilisateur supprimé à l'utilisateur anonyme
+        foreach ($user->getForumTopics() as $topic) {
+            $topic->setAuthor($anonymousUser);
+        }
+        
+        foreach ($user->getForumReplies() as $reply) {
+            $reply->setAuthor($anonymousUser);
         }
 
-        return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        // Supprimer l'utilisateur
+        $em->remove($user);
+        $em->flush();
+
+        return $this->redirectToRoute('user_list');
     }
 }

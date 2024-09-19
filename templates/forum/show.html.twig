@@ -1,25 +1,48 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<h1>{{ topic.title }}</h1>
-<p>Par {{ topic.author.email }} le {{ topic.createdAt|date('d-m-Y H:i') }}</p>
-<p>{{ topic.content }}</p>
-
-<h2>Réponses</h2>
-<ul>
-    {% for reply in replies %}
-        <li>
-            <p>{{ reply.content }}</p>
-            <p>Par {{ reply.author.email }} le {{ reply.createdAt|date('d-m-Y H:i') }}</p>
-        </li>
+<div class="container mt-4">
+    <h1>{{ topic.title }}</h1>
+    {% if topic.author.email == 'anonymous@forum.com' %} 
+    <p>Posté par : Anonyme</p> le {{ topic.createdAt|date('d-m-Y H:i') }}
     {% else %}
-        <li>Aucune réponse pour l'instant.</li>
-    {% endfor %}
-</ul>
+        <p>Posté par : {{ topic.author.name }}</p>
+    {% endif %}
 
-<h3>Ajouter une réponse</h3>
-{{ form_start(form) }}
-{{ form_widget(form) }}
-<button type="submit">Répondre</button>
-{{ form_end(form) }}
+    <p>{{ topic.content }}</p>
+
+    <h2 class="mt-4">Réponses</h2>
+    <ul class="list-group mb-4">
+        {% for reply in replies.items %}
+            <li class="list-group-item">
+                <p>{{ reply.content }}</p>
+                {% if topic.author.email == 'anonymous@forum.com' %}
+                    <p class="text-muted">Par Anonyme le {{ reply.createdAt|date('d-m-Y H:i') }}</p>
+                {% else %}
+                    <p>Posté par : {{ reply.author.name }}</p>
+                {% endif %}
+            </li>
+        {% else %}
+            <li class="list-group-item">Aucune réponse pour l'instant.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Pagination pour les réponses -->
+    <nav aria-label="Page navigation" class="mt-4">
+        {{ knp_pagination_render(replies) }}
+    </nav>
+
+    <!-- Formulaire pour ajouter une réponse -->
+    <h3>Ajouter une réponse</h3>
+    <div class="card mt-3">
+        <div class="card-body">
+            {{ form_start(form) }}
+            <div class="mb-3">
+                {{ form_row(form.content, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <button type="submit" class="btn btn-success">Répondre</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
 {% endblock %}
