@@ -13,8 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TripRepository::class)]
 #[Vich\Uploadable]
-#[ORM\HasLifecycleCallbacks()]
-
+#[ORM\HasLifecycleCallbacks]
 class Trip
 {
     #[ORM\Id]
@@ -42,6 +41,9 @@ class Trip
     )]
     private ?\DateTimeInterface $endDate = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
+
     #[ORM\Column(length: 255)]
     private ?string $destination = null;
 
@@ -53,45 +55,34 @@ class Trip
 
     #[ORM\Column(nullable: true)]
     private ?string $imageName = null;
-    
+
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $imageSize = null;
-    
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $creationDate = null;
 
-    /**
-     * @var Collection<int, TripUser>
-     */
-    #[ORM\OneToMany(targetEntity: TripUser::class, mappedBy: 'trip')]
+    #[ORM\OneToMany(targetEntity: TripUser::class, mappedBy: 'trip', cascade: ['persist', 'remove'])]
     private Collection $tripUsers;
 
-    /**
-     * @var Collection<int, TripActivity>
-     */
-    #[ORM\OneToMany(targetEntity: TripActivity::class, mappedBy: 'trip')]
-    private Collection $TripActivities;
+    #[ORM\OneToMany(targetEntity: TripActivity::class, mappedBy: 'trip', cascade: ['persist', 'remove'])]
+    private Collection $tripActivities;
 
-    /**
-     * @var Collection<int, expense>
-     */
-    #[ORM\OneToMany(targetEntity: Expense::class, mappedBy: 'trip')]
+    #[ORM\OneToMany(targetEntity: Expense::class, mappedBy: 'trip', cascade: ['persist', 'remove'])]
     private Collection $expenses;
 
-    /**
-     * @var Collection<int, TripInvitation>
-     */
-    #[ORM\OneToMany(targetEntity: TripInvitation::class, mappedBy: 'trip')]
+    #[ORM\OneToMany(targetEntity: TripInvitation::class, mappedBy: 'trip', cascade: ['persist', 'remove'])]
     private Collection $invitations;
 
-   
     public function __construct()
     {
         $this->tripUsers = new ArrayCollection();
+        $this->tripActivities = new ArrayCollection();
         $this->expenses = new ArrayCollection();
         $this->invitations = new ArrayCollection();
     }
+
+    // Getters and Setters...
 
     public function getId(): ?int
     {
@@ -170,9 +161,7 @@ class Trip
         return $this;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function setCreationDateValue(): void
     {
         $this->creationDate = new \DateTime();
@@ -183,9 +172,59 @@ class Trip
         return $this->creationDate;
     }
 
-    public function setCreationDate(?\DateTimeInterface $creationDate): self
+    public function setCreationDate(?\DateTimeInterface $creationDate): static
     {
         $this->creationDate = $creationDate;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if ($imageFile) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    public function setImageName(?string $imageName): static
+    {
+        $this->imageName = $imageName;
+
+        return $this;
+    }
+
+    public function getImageSize(): ?int
+    {
+        return $this->imageSize;
+    }
+
+    public function setImageSize(?int $imageSize): static
+    {
+        $this->imageSize = $imageSize;
 
         return $this;
     }
@@ -211,7 +250,6 @@ class Trip
     public function removeTripUser(TripUser $tripUser): static
     {
         if ($this->tripUsers->removeElement($tripUser)) {
-            // set the owning side to null (unless already changed)
             if ($tripUser->getTrip() === $this) {
                 $tripUser->setTrip(null);
             }
@@ -225,13 +263,13 @@ class Trip
      */
     public function getTripActivities(): Collection
     {
-        return $this->TripActivities;
+        return $this->tripActivities;
     }
 
     public function addTripActivity(TripActivity $tripActivity): static
     {
-        if (!$this->TripActivities->contains($tripActivity)) {
-            $this->TripActivities->add($tripActivity);
+        if (!$this->tripActivities->contains($tripActivity)) {
+            $this->tripActivities->add($tripActivity);
             $tripActivity->setTrip($this);
         }
 
@@ -240,8 +278,7 @@ class Trip
 
     public function removeTripActivity(TripActivity $tripActivity): static
     {
-        if ($this->TripActivities->removeElement($tripActivity)) {
-            // set the owning side to null (unless already changed)
+        if ($this->tripActivities->removeElement($tripActivity)) {
             if ($tripActivity->getTrip() === $this) {
                 $tripActivity->setTrip(null);
             }
@@ -251,7 +288,7 @@ class Trip
     }
 
     /**
-     * @return Collection<int, expense>
+     * @return Collection<int, Expense>
      */
     public function getExpenses(): Collection
     {
@@ -271,87 +308,12 @@ class Trip
     public function removeExpense(Expense $expense): static
     {
         if ($this->expenses->removeElement($expense)) {
-            // set the owning side to null (unless already changed)
             if ($expense->getTrip() === $this) {
                 $expense->setTrip(null);
             }
         }
 
         return $this;
-    }
-
-    public function getParticipants(): Collection
-    {
-        return $this->tripUsers->map(function (TripUser $tripUser) {
-            return $tripUser->getUser();
-        });
-    }
-
-    // Optionnel : Méthode pour vérifier si un utilisateur est un participant
-    public function isParticipant(User $user): bool
-    {
-        foreach ($this->tripUsers as $tripUser) {
-            if ($tripUser->getUser() === $user) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Optionnel : Méthode pour ajouter un participant
-    public function addParticipant(User $user): self
-    {
-        if (!$this->isParticipant($user)) {
-            $tripUser = new TripUser();
-            $tripUser->setUser($user);
-            $tripUser->setTrip($this);
-            $this->tripUsers->add($tripUser);
-        }
-        return $this;
-    }
-
-    // Optionnel : Méthode pour retirer un participant
-    public function removeParticipant(User $user): self
-    {
-        $this->tripUsers->filter(function (TripUser $tripUser) use ($user) {
-            return $tripUser->getUser() === $user;
-        })->map(function (TripUser $tripUser) {
-            $this->tripUsers->removeElement($tripUser);
-            $tripUser->setTrip(null);
-        });
-        return $this;
-    }
-
-    
-
-    public function setImageFile(?File $imageFile = null): void
-    {
-        $this->imageFile = $imageFile;
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
-    }
-
-    public function setImageName(?string $imageName): void
-    {
-        $this->imageName = $imageName;
-    }
-
-    public function getImageName(): ?string
-    {
-        return $this->imageName;
-    }
-
-    public function setImageSize(?int $imageSize): void
-    {
-        $this->imageSize = $imageSize;
-    }
-
-    public function getImageSize(): ?int
-    {
-        return $this->imageSize;
     }
 
     /**
@@ -375,7 +337,6 @@ class Trip
     public function removeInvitation(TripInvitation $invitation): static
     {
         if ($this->invitations->removeElement($invitation)) {
-            // set the owning side to null (unless already changed)
             if ($invitation->getTrip() === $this) {
                 $invitation->setTrip(null);
             }
@@ -384,6 +345,3 @@ class Trip
         return $this;
     }
 }
-
-
-

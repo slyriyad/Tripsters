@@ -25,14 +25,18 @@
             <a href="{{ path('trip_invite', {'id': trip.id}) }}">Inviter un tripster !</a>
         </div>
     </div>
-{# Dans templates/activity/index.html.twig
-<a href="{{ path('app_category_activity_new') }}">Créer une nouvelle catégorie</a> #}
+
     <div class="cards">
         <div class="card" id="budgetCard">
             <h2>Budget</h2>
             <p>{{ trip.budget }} €</p>  
             <h2>Dépense</h2>
             <p id="totalExpense">0 €</p>
+            {% if isBudgetExceeded %}
+                <div class="alert alert-danger mt-3" role="alert">
+                    Alerte ! Le budget du voyage est dépassé !
+                </div>
+            {% endif %}
         </div>  
         <svg viewBox="0 0 36 36" class="circle-svg">
             <path class="around" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>

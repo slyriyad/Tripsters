@@ -86,41 +86,44 @@ class TripController extends AbstractController
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
-        return $this->redirectToRoute('app_login');
-    }
-           
-        
-    // Récupérer les activités et dépenses associées au voyage
-    $activities = $trip->getTripActivities();
-    $startDate = $trip->getStartDate();
-    $endDate = $trip->getEndDate();
-    $interval = $startDate->diff($endDate);
-    $days = $interval->days;
+            return $this->redirectToRoute('app_login');
+        }
 
-    $totalCostActivity = 0;
-    foreach ($trip->getTripActivities() as $tripActivity) {
-        $totalCostActivity += $tripActivity->getActivity()->getCost();
-    }
+        // Récupérer les activités et dépenses associées au voyage
+        $activities = $trip->getTripActivities();
+        $startDate = $trip->getStartDate();
+        $endDate = $trip->getEndDate();
+        $interval = $startDate->diff($endDate);
+        $days = $interval->days;
 
-    $totalCostExpense = 0;
-    foreach ($trip->getExpenses() as $expense) {
-        $totalCostExpense += $expense->getAmount();
-    }
-    $totalCost = $totalCostActivity + $totalCostExpense;
+        $totalCostActivity = 0;
+        foreach ($trip->getTripActivities() as $tripActivity) {
+            $totalCostActivity += $tripActivity->getActivity()->getCost();
+        }
 
-    $categories = $categoryRepository->findAll();
+        $totalCostExpense = 0;
+        foreach ($trip->getExpenses() as $expense) {
+            $totalCostExpense += $expense->getAmount();
+        }
+
+        // Calcul du coût total
+        $totalCost = $totalCostActivity + $totalCostExpense;
+
+        // Vérification si le budget est dépassé
+        $isBudgetExceeded = $totalCost > $trip->getBudget();
+
+        $categories = $categoryRepository->findAll();
 
         return $this->render('trip/show.html.twig', [
-        'trip' => $trip,
-        'activities' => $activities,
-        'days' => $days,
-        'totalCost' => $totalCost,
-        'activities' => $activities,
-        'categories' => $categories,
-    ]);
-       
-    
+            'trip' => $trip,
+            'activities' => $activities,
+            'days' => $days,
+            'totalCost' => $totalCost,
+            'categories' => $categories,
+            'isBudgetExceeded' => $isBudgetExceeded, // Passer l'information à la vue
+        ]);
     }
+
 
     #[Route('/{id}/edit', name: 'app_trip_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Trip $trip, EntityManagerInterface $entityManager): Response
@@ -129,16 +132,24 @@ class TripController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Ici, VichUploader doit gérer l'image via le setter
+            if ($form->get('imageFile')->getData()) {
+                $trip->setImageFile($form->get('imageFile')->getData());
+            }
+
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_trip_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Le voyage a été modifié avec succès !');
+            return $this->redirectToRoute('app_trip_show', ['id' => $trip->getId()]);
         }
 
         return $this->render('trip/edit.html.twig', [
             'trip' => $trip,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
+
+
 
     #[Route('/{id}', name: 'app_trip_delete', methods: ['POST'])]
     public function delete(Request $request, Trip $trip, EntityManagerInterface $entityManager): Response
@@ -287,30 +298,62 @@ class TripController extends AbstractController
     }
 
     #[Route('/{tripId}/expenses', name: 'app_expense_index', methods: ['GET', 'POST'])]
-    public function indexexpense(Request $request, int $tripId, ExpenseRepository $expenseRepository,CategoryExpenseRepository $categoryRepository,EntityManagerInterface $entityManager): Response
+    public function indexexpense(Request $request, int $tripId, ExpenseRepository $expenseRepository, CategoryExpenseRepository $categoryRepository, EntityManagerInterface $entityManager): Response
     {
+        // Récupérer le voyage
         $trip = $entityManager->getRepository(Trip::class)->find($tripId);
         
         if (!$trip) {
             throw $this->createNotFoundException('Le voyage demandé n\'existe pas.');
         }
+
+        // Obtenir les dépenses par catégorie
         $expensesByCategory = $expenseRepository->getSumByCategory($trip);
-        
+
+        // Calculer le total des dépenses
         $totalExpenses = array_sum(array_column($expensesByCategory, 'total'));
 
+        // Calculer si le budget est dépassé
+        $budgetExceeded = $totalExpenses > $trip->getBudget();
+
+        // Récupérer les récentes dépenses
         $recentExpenses = $expenseRepository->findBy(['trip' => $trip], ['date' => 'DESC'], 5);
 
+        // Récupérer toutes les catégories
         $allCategories = $categoryRepository->findAll();
+
+        // Calcul du coût total des activités
+        $totalCostActivity = 0;
+        foreach ($trip->getTripActivities() as $tripActivity) {
+            $totalCostActivity += $tripActivity->getActivity()->getCost();
+        }
+
+        // Création d'une nouvelle dépense
+        $expense = new Expense();
+        $expense->setTrip($trip);
+
+        // Récupérer les activités et dépenses associées au voyage
+        $activities = $trip->getTripActivities();
+        $startDate = $trip->getStartDate();
+        $endDate = $trip->getEndDate();
+        $interval = $startDate->diff($endDate);
+        $days = $interval->days;
 
         $totalCostActivity = 0;
         foreach ($trip->getTripActivities() as $tripActivity) {
             $totalCostActivity += $tripActivity->getActivity()->getCost();
         }
 
+        $totalCostExpense = 0;
+        foreach ($trip->getExpenses() as $expense) {
+            $totalCostExpense += $expense->getAmount();
+        }
 
-        $expense = new Expense();
-        $expense->setTrip($trip);
-        
+        // Calcul du coût total
+        $totalCost = $totalCostActivity + $totalCostExpense;
+        $isBudgetExceeded = $totalCost > $trip->getBudget();
+
+        // Formulaire d'ajout de dépense
         $form = $this->createForm(ExpenseType::class, $expense);
         $form->handleRequest($request);
 
@@ -322,6 +365,7 @@ class TripController extends AbstractController
             return $this->redirectToRoute('app_expense_index', ['tripId' => $tripId]);
         }
 
+        // Rendu du template avec les données
         return $this->render('expense/index.html.twig', [
             'expenses' => $expenseRepository->findBy(['trip' => $trip]),
             'expenseForm' => $form->createView(),
@@ -330,7 +374,11 @@ class TripController extends AbstractController
             'totalExpenses' => $totalExpenses,
             'recentExpenses' => $recentExpenses,
             'totalCostActivity' => $totalCostActivity,
-            'allCategories' => $allCategories, 
+            'budgetExceeded' => $budgetExceeded, // Ajout de l'information de dépassement du budget
+            'allCategories' => $allCategories,
+            'totalCost' => $totalCost,
+            'isBudgetExceeded' => $isBudgetExceeded,
         ]);
     }
+
 }

@@ -27,12 +27,11 @@ class TripType extends AbstractType
             ->add('destination',TextType::class)
             ->add('budget',IntegerType::class)
             ->add('imageFile', VichImageType::class, [
-                'required' => false,
-                'allow_delete' => true,
-                'delete_label' => 'Supprimer l\'image',
-                'download_uri' => false,
-                'image_uri' => true,
-                'asset_helper' => true,
+                'required' => false,  // Permet de ne pas forcer la modification de l'image
+                'allow_delete' => true, // Permet de supprimer l'image
+                'download_uri' => false, // Désactive l'URI de téléchargement
+                'image_uri' => true, // Active l'affichage de l'image
+                'label' => 'Image du voyage (JPG/PNG)',
             ])
         ;
     }

@@ -26,6 +26,7 @@ class ExpenseController extends AbstractController
     #[Route('/{id}', name: 'app_expense_show', methods: ['GET'])]
     public function show(Expense $expense): Response
     {
+        
         return $this->render('expense/show.html.twig', [
             'expense' => $expense,
         ]);

@@ -15,14 +15,14 @@
 {% block body %}
 <div class="up">
     <div class="info-left">
-        <img src="https://wallpapercave.com/wp/wp3004763.jpg" alt="Trip Image">
+        <img src="{{ asset('uploads/avatars/' ~ trip.imageName) }}" alt="">
         <div class="info_trip">
             <h1>{{ trip.name }}</h1>
             <p>Du {{ trip.startDate ? trip.startDate|date('d-m-Y') : '' }} au {{ trip.endDate ? trip.endDate|date('d-m-Y') : '' }}</p>
+            <a href="{{ path('app_trip_edit', {'id': trip.id}) }}">Modifier</a>
+            <a href="{{ path('trip_invite', {'id': trip.id}) }}">Inviter un tripster !</a>
         </div>
     </div>
-    
-    {# <a href="{{ path('app_category_activity_new') }}" class="btn-create-category">Créer une nouvelle catégorie</a> #}
 
     <div class="cards">
         <div class="card" id="budgetCard">
@@ -30,11 +30,16 @@
             <p>{{ trip.budget }} €</p>  
             <h2>Dépense</h2>
             <p id="totalExpense">0 €</p>
+            {% if isBudgetExceeded %}
+                <div class="alert alert-danger mt-3" role="alert">
+                    Alerte ! Le budget du voyage est dépassé !
+                </div>
+            {% endif %}
         </div>  
         <svg viewBox="0 0 36 36" class="circle-svg">
             <path class="around" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-            <path class="percent" stroke-dasharray="{{ totalCostActivity / trip.budget  * 100 }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-            <text x="18" y="14" text-anchor="middle" dy="7" font-size="20">{{ (totalCostActivity / trip.budget * 100)|round(1, 'floor') }} %</text>
+            <path class="percent" stroke-dasharray="{{totalCost / trip.budget  * 100}}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+            <text x="18" y="14" text-anchor="middle" dy="7" font-size="20">{{(totalCost / trip.budget  * 100)|round(1, 'floor')}} %</text>
         </svg>
     </div>
 </div>
@@ -85,8 +90,16 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
     <script>
         $(document).ready(function() {
-            let totalCostActivity = {{ totalCostActivity }};
-            $('#totalExpense').text(totalCostActivity + ' €');
+            let totalCost = {{ totalCost }};
+            $('#totalExpense').text(totalCost + ' €');
+
+            $('.add-activity').on('click', function() {
+                $('#activityModal').show();
+                const defaultDate = new Date('{{ trip.startDate|date('Y-m-d') }}');
+                const formattedDate = defaultDate.toISOString().split('T')[0];
+                $('#activityStartDate').val(formattedDate + 'T09:00');
+                $('#activityEndDate').val(formattedDate + 'T10:00');
+            });
         });
     </script>
 {% endblock %}

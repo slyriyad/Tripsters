@@ -61,10 +61,12 @@
                         <img src="{{ asset('uploads/avatars/' ~ app.user.imageName) }}" alt="Profile Picture" class="user-avatar">
                     {% else %}
                         <div class="user-avatar default-avatar">
-                            {{ app.user.email|first|upper }}
+                            {{ app.user.name|first|upper }}
                         </div>
                     {% endif %}
-                    <span class="user-email">{{ app.user.email }}</span>
+                    <a href="{{ path('app_user_edit', {'id': app.user.id}) }}">
+                        <span class="user-email">{{ app.user.name }}</span>
+                    </a>                        
                 </div>
                 <a href="{{ path('app_logout') }}" class="user-action">Logout</a>
             {% else %}
