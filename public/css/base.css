@@ -1,0 +1,180 @@
+
+* {
+    font-family: "Poppins", sans-serif;
+}
+
+#cards {
+    height: 10vh;
+    background-color: #007EA7;
+    padding: 2% 10%;
+    margin: 2% 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo span {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.navbar-menu {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-menu li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 50px;
+    margin: 0 10px;
+    background-color: #007EA7;
+    padding: 10px;
+    border-radius: 50%;
+    border: 2px solid #007EA7;
+    position: relative; /* Ensure positioning context for the pseudo-element */
+    overflow: hidden; /* Ensure content does not overflow */
+}
+
+.navbar-menu a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: color 0.5s;
+}
+
+.navbar-menu li:hover {
+    background-color: #ffffff;
+}
+
+.navbar-menu li:hover .icon {
+    opacity: 0; /* Hide the icon on hover */
+}
+
+.navbar-menu li:hover .text,
+.navbar-menu li:hover .adminText {
+    opacity: 1; /* Show the text on hover */
+    visibility: visible; /* Ensure the text is visible */
+}
+
+.navbar-menu .icon, 
+.navbar-menu .text, 
+.navbar-menu .adminText {
+    position: absolute;
+    transition: opacity 0.3s, visibility 0.3s; /* Smooth transition */
+}
+
+.navbar-menu .text {
+    color: #007EA7;
+}
+
+.navbar-menu .adminText {
+    color: #a70000;
+}
+
+.navbar-menu .text, 
+.navbar-menu .adminText {
+    opacity: 0; /* Initially hide the text */
+    visibility: hidden; /* Initially hide the text */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+}
+
+.navbar-menu .icon {
+    font-size: 20px; /* Adjust icon size */
+}
+
+
+
+.admin {
+    background-color: #a70000!important;
+    border: 2px solid #a70000!important;
+}
+
+.admin:hover {
+    background-color: #ffffff!important;
+}
+
+
+.user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user span {
+    font-size: 16px;
+    color: #333;
+}
+
+.user a {
+    text-decoration: none;
+    color: #333;
+    margin-left: 10px;
+    font-size: 16px;
+}
+
+.user-action {
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.user-action:hover {
+    background-color: #e0e0e0;
+}
+
+.default-avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ccc;
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 50%;
+}

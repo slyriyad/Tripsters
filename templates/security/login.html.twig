@@ -3,39 +3,100 @@
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
+<style>
+    /* Ajouter le style CSS ici */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    
+    header{
+        position: absolute;
+        top: 0;
+    }
+    .login-container {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 350px;
+    }
+
+    .login-container h1 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(90deg, #709BE3, #FFD4AA);
+        -webkit-background-clip: text;
+        color: transparent;
+    }
+
+    .login-container input[type="email"], 
+    .login-container input[type="password"] {
+        border: 2px solid #7f8cff;
+        border-radius: 25px;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+    .login-container input[type="email"]:focus, 
+    .login-container input[type="password"]:focus {
+        border-color: #5b69e3;
+    }
+
+    .login-container button {
+        background-color: #5b69e3;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
+
+    .login-container button:hover {
+        background-color: #4a56c9;
+    }
+
+    .login-container .alert {
+        color: red;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    .login img{
+        height: 100vh;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+</style>
+<div class="login-container">
+    <h1>Login</h1>
     <form method="post">
         {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            <div class="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
 
-        {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
-            </div>
-        {% endif %}
+        <input type="email" name="email" placeholder="Username" value="{{ last_username }}" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="email" id="username" class="form-control" autocomplete="email" required autofocus>
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password" class="form-control" autocomplete="current-password" required>
-
-        <input type="hidden" name="_csrf_token"
-               value="{{ csrf_token('authenticate') }}"
-        >
-
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
-
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
-            </div>
-        #}
-
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
+        <button type="submit">LOGIN</button>
     </form>
+</div>
+<section class="login">
+    <img src="{{ asset('img/login.png') }}" alt="">
+</section>
 {% endblock %}

@@ -1,18 +1,123 @@
 {% extends 'base.html.twig' %}
 {% block title %}Register{% endblock %}
 {% block body %}
-<h1>Register</h1>
-{{ form_errors(registrationForm) }}
+<style>
+    /* Styles CSS pour le formulaire */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
 
-{{ form_start(registrationForm) }}
-    {{ form_row(registrationForm.email) }}
-    {{ form_row(registrationForm.name) }}
-    {{ form_row(registrationForm.plainPassword, {
-        label: 'Password'
-    }) }}
-    {{ form_row(registrationForm.agreeTerms) }}
-    {{ form_row(registrationForm.imageFile) }}
-    
-    <button type="submit" class="btn">Register</button>
-{{ form_end(registrationForm) }}
+    header{
+        position: absolute;
+        top: 0;
+    }
+
+    .register-container {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 400px;
+    }
+
+    .register-container h1 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(90deg, #F39662, #161C99);
+        -webkit-background-clip: text;
+        color: transparent;
+    }
+
+    .register-container input[type="text"],
+    .register-container input[type="email"],
+    .register-container input[type="password"],
+    .register-container input[type="file"] {
+        border: 2px solid #7f8cff;
+        border-radius: 25px;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+    .register-container input[type="text"]:focus,
+    .register-container input[type="email"]:focus,
+    .register-container input[type="password"]:focus,
+    .register-container input[type="file"]:focus {
+        border-color: #5b69e3;
+    }
+
+    .register-container button {
+        background-color: #f38b66;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 1rem;
+        transition: background-color 0.3s;
+    }
+
+    .register-container button:hover {
+        background-color: #e07a58;
+    }
+
+    .register-container .secondary-button {
+        background-color: #2b6cb0;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
+
+    .register-container .secondary-button:hover {
+        background-color: #1e4d7c;
+    }
+
+    .register img{
+        height: 100vh;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+</style>
+
+<div class="register-container">
+    <h1>Register</h1>
+
+    {# Affichage des erreurs globaux du formulaire #}
+    {{ form_errors(registrationForm) }}
+
+    {{ form_start(registrationForm, {'attr': {'class': 'form-horizontal'}}) }}
+
+        {# Champs rendus avec form_row pour éviter la répétition #}
+        {{ form_row(registrationForm.name, {'attr': {'placeholder': 'Full Name'}}) }}
+        {{ form_row(registrationForm.email, {'attr': {'placeholder': 'E-mail'}}) }}
+        {{ form_row(registrationForm.plainPassword.first, {'attr': {'placeholder': 'Password'}}) }}
+        {{ form_row(registrationForm.plainPassword.second, {'attr': {'placeholder': 'Confirm Password'}}) }}
+        {{ form_row(registrationForm.imageFile, {'attr': {'placeholder': 'Choose an image'}}) }}
+
+        <button type="submit">Register</button>
+        <button type="button" class="secondary-button">Have account? Sign In</button>
+
+    {{ form_end(registrationForm) }}
+</div>
+<section class="register">
+    <img src="{{ asset('img/register.png') }}" alt="">
+</section>
 {% endblock %}
