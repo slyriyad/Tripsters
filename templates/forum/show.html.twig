@@ -31,7 +31,7 @@
     <nav aria-label="Page navigation" class="mt-4">
         {{ knp_pagination_render(replies) }}
     </nav>
-
+    {% if app.user %}
     <!-- Formulaire pour ajouter une réponse -->
     <h3>Ajouter une réponse</h3>
     <div class="card mt-3">
@@ -44,5 +44,6 @@
             {{ form_end(form) }}
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
