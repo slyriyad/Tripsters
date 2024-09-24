@@ -539,3 +539,84 @@ h1, h2, h3 {
   align-self: flex-end;
 }
 
+@media (max-width: 576px) {
+
+  .up{
+    flex-direction: column;
+    height: 50vh;
+  }
+    
+  /* Centrage des boutons sous l'image */
+  .info_trip a {
+      display: block;
+      width: 90%;
+      margin: 10px auto;
+      text-align: center;
+      padding: 10px;
+      background-color: #007EA7;
+      border-radius: 15px;
+      color: white;
+  }
+
+  /* Section Budget et Dépense : Aligner les cartes verticalement */
+  .cards {
+      width: 90%;
+      margin-top: 20px auto;
+      text-align: center;
+      padding: 0px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  }
+
+  /* Agrandir et centrer la jauge circulaire */
+  .circle-svg {
+      display: block;
+      margin: 20px auto;
+      width: 100px; /* Ajuste la taille ici */
+      height: 100px; /* Ajuste la taille ici */
+  }
+
+  .circle-svg text {
+      font-size: 18px; /* Ajustement de la taille de la police dans la jauge */
+      fill: white;
+  }
+
+  /* Espacement pour le texte du budget */
+  .cards h2, .cards p {
+      margin: 10px 0;
+      color: white;
+  }
+
+  /* Centrer les éléments de la section calendrier */
+  .swiper-slide {
+      width: 100%;
+      margin-bottom: 10px;
+  }
+
+  .add-activity {
+      width: 90%;
+      margin: 20px auto;
+      display: block;
+      text-align: center;
+      padding: 10px;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 5px;
+      border: none;
+  }
+
+  .info_trip{
+    width: 80vw;
+    position: absolute;
+    left: 0;
+  }
+
+ #budgetCard , .info-left, .info-left img{
+  height: 170px;
+  width: 90vw;
+  margin: 0px;
+  padding: 0px;
+ }
+}

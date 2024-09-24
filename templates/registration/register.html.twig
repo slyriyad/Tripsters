@@ -95,10 +95,57 @@
         right: 0;
         top: 0;
     }
+
+    @media (max-width: 1830px) {
+        .register img {
+            display: none;
+        }
+    
+    }
+
+    @media (max-width: 768px) {
+        .register-container {
+            width: 90%;
+            padding: 1.5rem;
+        }
+    
+        .register img {
+            display: none;
+        }
+    
+        body {
+            padding: 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .register-container {
+            padding: 1rem;
+            border-radius: 10px;
+        }
+    
+        .register-container h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+    
+        .register-container input[type="text"],
+        .register-container input[type="email"],
+        .register-container input[type="password"],
+        .register-container input[type="file"] {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+    
+        .register-container button,
+        .register-container .secondary-button {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
 </style>
 
 <div class="register-container">
-    <h1>Register</h1>
+    <h1>Inscription</h1>
 
     {# Affichage des erreurs globaux du formulaire #}
     {{ form_errors(registrationForm) }}
@@ -106,14 +153,14 @@
     {{ form_start(registrationForm, {'attr': {'class': 'form-horizontal'}}) }}
 
         {# Champs rendus avec form_row pour éviter la répétition #}
-        {{ form_row(registrationForm.name, {'attr': {'placeholder': 'Full Name'}}) }}
+        {{ form_row(registrationForm.name, {'attr': {'placeholder': 'Pseudo'}}) }}
         {{ form_row(registrationForm.email, {'attr': {'placeholder': 'E-mail'}}) }}
-        {{ form_row(registrationForm.plainPassword.first, {'attr': {'placeholder': 'Password'}}) }}
-        {{ form_row(registrationForm.plainPassword.second, {'attr': {'placeholder': 'Confirm Password'}}) }}
-        {{ form_row(registrationForm.imageFile, {'attr': {'placeholder': 'Choose an image'}}) }}
+        {{ form_row(registrationForm.plainPassword.first, {'attr': {'placeholder': 'Mot de passe'}}) }}
+        {{ form_row(registrationForm.plainPassword.second, {'attr': {'placeholder': 'Confirmer le mot de passe'}}) }}
+        {{ form_row(registrationForm.imageFile, {'attr': {'placeholder': 'choisir une image'}}) }}
 
-        <button type="submit">Register</button>
-        <button type="button" class="secondary-button">Have account? Sign In</button>
+        <button type="submit">Inscription</button>
+        <button type="button" class="secondary-button">vous avez déja un compte ? connectez-vous</button>
 
     {{ form_end(registrationForm) }}
 </div>

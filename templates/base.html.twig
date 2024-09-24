@@ -27,13 +27,13 @@
                     <li>
                         <a href="{{ path('app_trip_index') }}">
                             <i class="fa-solid fa-house icon"></i>
-                            <p class="text">Home</p>
+                            <p class="text">Acceuil</p>
                         </a>
                     </li>
                     <li>
                         <a href="{{ path('app_trip_index') }}">
                             <i class="fa-regular fa-calendar icon"></i>
-                            <p class="text">Trip</p>
+                            <p class="text">Voyage</p>
                         </a>
                     </li>
                     <li>
@@ -68,10 +68,10 @@
                         <span class="user-email">{{ app.user.name }}</span>
                     </a>                        
                 </div>
-                <a href="{{ path('app_logout') }}" class="user-action">Logout</a>
+                <a href="{{ path('app_logout') }}" class="user-action">déconnexion</a>
             {% else %}
-                <a href="{{ path('app_login') }}" class="user-action">Login</a>
-                <a href="{{ path('app_register') }}" class="user-action">Register</a>
+                <a href="{{ path('app_login') }}" class="user-action">déconnexion</a>
+                <a href="{{ path('app_register') }}" class="user-action">inscription</a>
             {% endif %}
         </div>
     </header>

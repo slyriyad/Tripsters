@@ -110,7 +110,6 @@
     background-color: #0056b3;
 }
 
-/* Media Queries for responsiveness */
 @media (max-width: 768px) {
     .trips-header {
         flex-direction: column;
@@ -119,5 +118,39 @@
     
     .trips-header h1 {
         margin-bottom: 1rem;
+    }
+
+    .trip-details {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .trip-details .detail {
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .trip-content h2 {
+        font-size: 1.25rem;
+    }
+
+    .trip-content p {
+        font-size: 0.9rem;
+    }
+
+    .trip-details {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .trip-actions {
+        flex-direction: column;
+    }
+
+    .trip-actions a {
+        margin-bottom: 0.5rem;
+        width: 100%;
+        text-align: center;
     }
 }

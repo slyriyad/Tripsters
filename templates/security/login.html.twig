@@ -81,19 +81,63 @@
         right: 0;
         top: 0;
     }
+
+    @media (max-width: 1830px) {
+        .login img {
+            display: none;
+        }
+    
+    }
+
+    @media (max-width: 768px) {
+        .login-container {
+            width: 90%;
+            padding: 1.5rem;
+        }
+    
+        .login img {
+            display: none;
+        }
+    
+        body {
+            padding: 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .login-container {
+            padding: 1rem;
+            border-radius: 10px;
+        }
+    
+        .login-container h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+    
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+    
+        .login-container button {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
 </style>
 <div class="login-container">
-    <h1>Login</h1>
+    <h1>Connexion</h1>
     <form method="post">
         {% if error %}
             <div class="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
 
-        <input type="email" name="email" placeholder="Username" value="{{ last_username }}" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <input type="email" name="email" placeholder="e-mail" value="{{ last_username }}" required>
+        <input type="password" name="password" placeholder="Mot de passe" required>
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-        <button type="submit">LOGIN</button>
+        <button type="submit">Connexion</button>
     </form>
 </div>
 <section class="login">
