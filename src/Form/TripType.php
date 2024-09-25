@@ -16,16 +16,28 @@ class TripType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name',TextType::class)
-            ->add('description',TextType::class)
+            ->add('name',TextType::class, [
+                'label' => 'Nom',
+            ])
+            ->add('destination',TextType::class, [
+                'label' => 'Destination',
+            ])
+            ->add('description',TextType::class, [
+                'label' => 'Description',
+            ])
             ->add('startDate', null, [
                 'widget' => 'single_text',
-            ],DateType::class)
+            ],DateType::class, [
+                'label' => 'Date de début',
+            ])
             ->add('endDate', null, [
                 'widget' => 'single_text',
-            ],DateType::class)
-            ->add('destination',TextType::class)
-            ->add('budget',IntegerType::class)
+            ],DateType::class, [
+                'label' => 'Date de fin',
+            ])
+            ->add('budget',IntegerType::class, [
+                'label' => 'Budget',
+            ])
             ->add('imageFile', VichImageType::class, [
                 'required' => false,  // Permet de ne pas forcer la modification de l'image
                 'allow_delete' => true, // Permet de supprimer l'image

@@ -24,7 +24,7 @@ class ForumController extends AbstractController
         $pagination = $paginator->paginate(
             $query, // La requête (ne pas exécuter avec getResult())
             $request->query->getInt('page', 1), // Page actuelle
-            10 // Limite d'éléments par page
+            5 // Limite d'éléments par page
         );
 
         // Transmettre la variable pagination à la vue Twig

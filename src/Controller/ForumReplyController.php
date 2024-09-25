@@ -42,7 +42,7 @@ class ForumReplyController extends AbstractController
         $pagination = $paginator->paginate(
             $query, /* Query des réponses */
             $request->query->getInt('page', 1), /* Numéro de page */
-            2 /* Limite de réponses par page */
+            5 /* Limite de réponses par page */
         );
 
         return $this->render('forum/show.html.twig', [

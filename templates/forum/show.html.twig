@@ -20,6 +20,7 @@
                     <p class="text-muted">Par Anonyme le {{ reply.createdAt|date('d-m-Y H:i') }}</p>
                 {% else %}
                     <p>Posté par : {{ reply.author.name }}</p>
+                    <p>{{ reply.createdAt|date('d-m-Y H:i') }}</p>
                 {% endif %}
             </li>
         {% else %}

@@ -42,6 +42,12 @@
                             <p class="text">invitation</p>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ path('forum_index') }}">
+                            <i id="icon" class="fa-solid fa-comments"></i>
+                            <p class="text">Forum</p>
+                        </a>
+                    </li>
                     {% block extra_nav %}{% endblock %}
                 {% endif %}
                 {% if is_granted('ROLE_ADMIN') %}

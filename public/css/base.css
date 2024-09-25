@@ -11,13 +11,12 @@
 }
 
 header {
-    position: absolute;
-    left: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
     background-color: #fff;
+    margin-bottom: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 

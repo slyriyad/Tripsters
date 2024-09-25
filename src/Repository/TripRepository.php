@@ -55,4 +55,17 @@ public function findTripsByUser(User $user)
         ->getQuery()
         ->getResult();
 }
+
+public function findCreatorByTrip(Trip $trip): ?TripUser
+{
+    return $this->createQueryBuilder('t')
+        ->select('tu')
+        ->join('t.tripUsers', 'tu')
+        ->where('tu.trip = :trip')
+        ->andWhere('tu.role = :role') // Le rôle de créateur
+        ->setParameter('trip', $trip)
+        ->setParameter('role', 'créateur')
+        ->getQuery()
+        ->getOneOrNullResult();
+}
 }
