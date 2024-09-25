@@ -32,7 +32,7 @@
 .info_trip a {
   color: white !important;
   position: relative;
-  top: -200px;
+  top: -150px;
   left: 20px;
 }
 
@@ -609,14 +609,66 @@ h1, h2, h3 {
 
   .info_trip{
     width: 80vw;
-    position: absolute;
+    position: relative;
     left: 0;
+    top: -50px;
   }
 
- #budgetCard , .info-left, .info-left img{
+ #budgetCard , .info-left{
   height: 170px;
   width: 90vw;
   margin: 0px;
   padding: 0px;
  }
+
+ .info-left img {
+  height: 90%;
+  width: 90vw;
+  margin: 0px;
+  padding: 0px;
+ }
 }
+
+
+
+  @media (max-width: 576px) {
+    
+
+ 
+
+   .expense-categories{
+    display: flex;
+    flex-direction: column;
+   }
+
+   .category-card{
+    margin: 5px 0;
+   }
+
+    .expense-item {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .expense-item .icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .expense-item .expense-details {
+        flex-grow: 1;
+        margin-left: 10px;
+    }
+
+    .expense-item .expense-amount {
+        font-size: 1rem;
+    }
+
+    .down{
+      display: flex;
+      flex-direction: column;
+    }
+}
+
+

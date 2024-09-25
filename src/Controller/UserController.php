@@ -83,7 +83,7 @@ class UserController extends AbstractController
 
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_trip_index');
         }
 
         return $this->render('user/edit.html.twig', [
@@ -115,6 +115,6 @@ class UserController extends AbstractController
         $em->remove($user);
         $em->flush();
 
-        return $this->redirectToRoute('app_user_index');
+        return $this->redirectToRoute('app_trip_index');
     }
 }

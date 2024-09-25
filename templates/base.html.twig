@@ -26,19 +26,19 @@
                 {% if is_granted('ROLE_USER') %}
                     <li>
                         <a href="{{ path('app_trip_index') }}">
-                            <i class="fa-solid fa-house icon"></i>
+                            <i id="icon" class="fa-solid fa-house icon"></i>
                             <p class="text">Acceuil</p>
                         </a>
                     </li>
                     <li>
                         <a href="{{ path('app_trip_index') }}">
-                            <i class="fa-regular fa-calendar icon"></i>
+                            <i id="icon" class="fa-regular fa-calendar icon"></i>
                             <p class="text">Voyage</p>
                         </a>
                     </li>
                     <li>
                         <a href="{{ path('dashboard') }}">
-                            <i class="fa-solid fa-envelope"></i>
+                            <i id="icon" class="fa-solid fa-envelope"></i>
                             <p class="text">invitation</p>
                         </a>
                     </li>
@@ -47,7 +47,7 @@
                 {% if is_granted('ROLE_ADMIN') %}
                     <li class="admin">
                         <a href="{{ path('admin') }}">
-                            <i class="fa-solid fa-screwdriver-wrench icon"></i>
+                            <i id="icon" class="fa-solid fa-screwdriver-wrench icon"></i>
                             <p class="adminText">Admin</p>
                         </a>
                     </li>
